@@ -1,15 +1,18 @@
 import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from 'react';
 import {
+  Building2,
   Check,
   LoaderCircle,
   LocateFixed,
   MapPin,
+  MapPinned,
   Search,
   Star,
   Trash2,
 } from 'lucide-react';
 import { PREFECTURES, nearestPrefecture, prefectureFor } from './prefectures';
 import { searchJapanSpots, spotById } from './spots';
+import { searchAdminPlaces, type AdminPlace } from './adminPlaces';
 import { searchOnlinePlaces, type OnlinePlace } from './onlineSearch';
 import { todayISO } from './dates';
 import {
@@ -67,6 +70,7 @@ export function PlaceSheet({
 
   const editing = Boolean(place);
   const results = useMemo(() => searchJapanSpots(query), [query]);
+  const adminResults = useMemo(() => searchAdminPlaces(query), [query]);
   const prefecture = prefectureFor(prefectureCode);
 
   useEffect(() => {
@@ -161,6 +165,20 @@ export function PlaceSheet({
       );
       setOnlineStatus('error');
     }
+  };
+
+  const chooseAdminPlace = (admin: AdminPlace) => {
+    setName(admin.name);
+    setNameJa(admin.nameJa);
+    setPrefectureCode(admin.prefectureCode);
+    setLat(admin.lat);
+    setLng(admin.lng);
+    setPointExact(true);
+    setCategory(admin.category);
+    setQuery('');
+    setOnlineStatus('idle');
+    setOnlineResults([]);
+    setOnlineError(null);
   };
 
   const chooseOnlinePlace = (online: OnlinePlace) => {
@@ -295,6 +313,29 @@ export function PlaceSheet({
           </div>
           {query.trim() ? (
             <div className="rt-search-results">
+              {adminResults.map((admin) => (
+                <button
+                  key={admin.id}
+                  type="button"
+                  className="rt-search-result"
+                  onClick={() => chooseAdminPlace(admin)}
+                >
+                  <span className="rt-search-result__icon">
+                    {admin.kind === 'prefecture' ? <MapPinned size={15} /> : <Building2 size={15} />}
+                  </span>
+                  <span>
+                    <strong>{admin.name}</strong>
+                    <small>
+                      {prefectureFor(admin.prefectureCode).name} ·{' '}
+                      {admin.kind === 'prefecture' ? '都道府县' : '城市'}
+                    </small>
+                  </span>
+                  <span className="rt-search-kind">
+                    {admin.kind === 'prefecture' ? '县' : '市'}
+                  </span>
+                </button>
+              ))}
+
               {results.length > 0 ? (
                 results.map((spot) => (
                   <button
@@ -314,11 +355,11 @@ export function PlaceSheet({
                     </span>
                   </button>
                 ))
-              ) : (
+              ) : adminResults.length === 0 ? (
                 <div className="rt-search-empty">
                   常用地点库里没有，试试下面的在线搜索。
                 </div>
-              )}
+              ) : null}
 
               <div className="rt-online-search">
                 <button
