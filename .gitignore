@@ -14,3 +14,6 @@ test-results
 
 # 本地预览用的二维码，IP 地址会变，不提交
 docs/local-preview-qr.png
+
+# Supabase CLI local cache
+supabase/.temp/
