@@ -2,6 +2,10 @@
 
 > 两个人的小家。一起买，也一起去。
 
+线上地址：https://newyik.github.io/home/
+
+旧地址 `https://newyik.github.io/together-list/` 会自动跳转到新地址。
+
 <p align="center">
   <img src="docs/screenshots/hub-mobile.png" width="42%" alt="小家首页" />
 </p>
@@ -196,7 +200,7 @@ npm run dev
 
 ### 5. 部署到 GitHub Pages
 
-1. 在 GitHub 新建一个仓库，比如 `together-list`。
+1. 在 GitHub 新建一个仓库，比如 `home`。
 2. 把本地代码推上去：
 
 ```bash
@@ -204,7 +208,7 @@ git init
 git add .
 git commit -m "一起买：两个人的采购清单"
 git branch -M main
-git remote add origin https://github.com/<你的用户名>/together-list.git
+git remote add origin https://github.com/<你的用户名>/home.git
 git push -u origin main
 ```
 
@@ -259,7 +263,7 @@ https://<你的用户名>.github.io/<仓库名>/
 3. 搜索并添加 **打开 URL**，填入你的网站地址，例如：
 
    ```
-   https://yourname.github.io/together-list/#/shopping
+   https://yourname.github.io/home/#/shopping
    ```
 
 4. 把快捷指令命名为「小家控」，选一个购物袋图标。
@@ -282,7 +286,7 @@ https://<你的用户名>.github.io/<仓库名>/
 这个快捷指令会直接调用网页的「快速添加」参数：
 
 ```
-https://yourname.github.io/together-list/?add=牛奶&quick=1#/shopping
+https://yourname.github.io/home/?add=牛奶&quick=1#/shopping
 ```
 
 - `add=牛奶`：要添加的内容
@@ -297,7 +301,7 @@ https://yourname.github.io/together-list/?add=牛奶&quick=1#/shopping
 4. 添加 **文本**，内容写：
 
    ```
-   https://yourname.github.io/together-list/?add=
+   https://yourname.github.io/home/?add=
    ```
 
    然后在后面插入上一步「URL 编码」的变量，最后加上：
