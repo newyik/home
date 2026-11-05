@@ -292,7 +292,7 @@ export function PlaceSheet({
       <div className="rt-form">
         <div className="rt-search-field">
           <label className="field__label" htmlFor="rt-spot-search">
-            先搜一下
+            先搜县市或景点
           </label>
           <div className="rt-search-field__control">
             <Search size={17} />
@@ -307,7 +307,7 @@ export function PlaceSheet({
                 setOnlineError(null);
                 onlineAbort.current?.abort();
               }}
-              placeholder="箱根、白川乡、金泽……"
+              placeholder="山口县、下关市、箱根……"
               autoComplete="off"
             />
           </div>
