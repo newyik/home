@@ -1,4 +1,5 @@
 import type { User } from '@supabase/supabase-js';
+import { isAvatarValue } from './avatar';
 import {
   CATEGORY_MAP,
   type Account,
@@ -38,7 +39,7 @@ export interface Backend {
   loadWorkspace(account: Account): Promise<Workspace | null>;
   createHousehold(account: Account, name: string, displayName: string): Promise<Workspace>;
   joinHousehold(account: Account, code: string, displayName: string): Promise<Workspace>;
-  updateProfile(account: Account, displayName: string): Promise<Account>;
+  updateProfile(account: Account, displayName?: string, avatar?: string | null): Promise<Account>;
   addItem(householdId: string, input: NewItem): Promise<Item>;
   updateItem(id: string, patch: ItemPatch): Promise<Item>;
   deleteItem(id: string): Promise<void>;
@@ -56,6 +57,7 @@ type ProfileRow = {
   id: string;
   display_name: string;
   avatar_color: string;
+  avatar: string | null;
 };
 
 type HouseholdRow = {
@@ -223,7 +225,7 @@ class SupabaseBackend implements Backend {
   private async accountForUser(user: User): Promise<Account> {
     const { data: existing, error } = await this.client
       .from('profiles')
-      .select('id, display_name, avatar_color')
+      .select('id, display_name, avatar_color, avatar')
       .eq('id', user.id)
       .maybeSingle<ProfileRow>();
 
@@ -243,13 +245,13 @@ class SupabaseBackend implements Backend {
           display_name: displayName.slice(0, 24),
           avatar_color: pickColor(user.id),
         })
-        .select('id, display_name, avatar_color')
+        .select('id, display_name, avatar_color, avatar')
         .single<ProfileRow>();
 
       if (insertError) {
         const { data: retry } = await this.client
           .from('profiles')
-          .select('id, display_name, avatar_color')
+          .select('id, display_name, avatar_color, avatar')
           .eq('id', user.id)
           .single<ProfileRow>();
         if (!retry) throw new Error(insertError.message);
@@ -264,6 +266,7 @@ class SupabaseBackend implements Backend {
       email: user.email ?? '',
       displayName: profile.display_name || '我',
       color: profile.avatar_color || pickColor(user.id),
+      avatar: profile.avatar,
     };
     cacheAccount(account);
     return account;
@@ -375,7 +378,7 @@ class SupabaseBackend implements Backend {
     const [membersResult, itemsResult, placesResult] = await Promise.all([
       this.client
         .from('household_members')
-        .select('user_id, joined_at, profiles!inner(id, display_name, avatar_color)')
+        .select('user_id, joined_at, profiles!inner(id, display_name, avatar_color, avatar)')
         .eq('household_id', householdRow.id)
         .order('joined_at', { ascending: true }),
       this.client
@@ -395,13 +398,14 @@ class SupabaseBackend implements Backend {
     if (placesResult.error) throw new Error(placesResult.error.message);
 
     const members: Member[] = ((membersResult.data ?? []) as unknown as MemberRow[])
-      .map((row) => {
+      .map((row): Member | null => {
         const profile = one(row.profiles);
         if (!profile) return null;
         return {
           id: profile.id,
           displayName: profile.display_name || '有人',
           color: profile.avatar_color || '#d9613d',
+          avatar: profile.avatar,
           isMe: profile.id === account.userId,
         };
       })
@@ -412,6 +416,7 @@ class SupabaseBackend implements Backend {
         id: account.userId,
         displayName: account.displayName,
         color: account.color,
+        avatar: account.avatar,
         isMe: true,
       });
     }
@@ -459,15 +464,21 @@ class SupabaseBackend implements Backend {
     return workspace;
   }
 
-  async updateProfile(account: Account, displayName: string): Promise<Account> {
-    const name = displayName.trim().slice(0, 24);
-    if (!name) throw new Error('名字不能为空。');
-    const { error } = await this.client
+  async updateProfile(account: Account, displayName?: string, avatar?: string | null): Promise<Account> {
+    const name = displayName?.trim().slice(0, 24);
+    if (name === '') throw new Error('名字不能为空。');
+    if (avatar !== undefined && !isAvatarValue(avatar)) throw new Error('头像格式不支持。');
+    const { data, error } = await this.client
       .from('profiles')
-      .update({ display_name: name })
-      .eq('id', account.userId);
+      .update({
+        ...(name !== undefined ? { display_name: name } : {}),
+        ...(avatar !== undefined ? { avatar } : {}),
+      })
+      .eq('id', account.userId)
+      .select('id, display_name, avatar_color, avatar')
+      .single<ProfileRow>();
     if (error) throw new Error(error.message);
-    const updated = { ...account, displayName: name };
+    const updated = { ...account, displayName: data.display_name, color: data.avatar_color, avatar: data.avatar };
     cacheAccount(updated);
     return updated;
   }

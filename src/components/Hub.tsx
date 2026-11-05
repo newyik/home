@@ -46,7 +46,7 @@ export function Hub() {
           <LogoMark size={42} />
           <div>
             <strong>{workspace.household.name}</strong>
-            <small>{demoMode ? '本地演示 · 2 人' : '两个人的小家'}</small>
+            {demoMode ? <small>本地演示</small> : null}
           </div>
         </div>
 
@@ -68,7 +68,7 @@ export function Hub() {
             onClick={() => setSettingsOpen(true)}
             aria-label="打开设置"
           >
-            <Avatar name={workspace.me.displayName} color={workspace.me.color} size={40} />
+            <Avatar name={workspace.me.displayName} color={workspace.me.color} avatar={workspace.me.avatar} size={40} />
             <span className="avatar-button__badge">
               <Settings2 size={10} />
             </span>
@@ -85,10 +85,9 @@ export function Hub() {
             </span>
             <h1>
               把日常过好，
-              <br />
               <em>也一起去远方。</em>
             </h1>
-            <p>一张清单，装下生活的小事；一张地图，收藏两个人的远方。</p>
+            <p>一起记清单，也收藏下一站。</p>
           </div>
           <img className="hub-hero__art" src={homeArt} alt="" aria-hidden="true" />
         </section>

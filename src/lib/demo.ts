@@ -1,3 +1,4 @@
+import { isAvatarValue } from './avatar';
 import type {
   Account,
   Category,
@@ -19,6 +20,7 @@ type DemoMember = {
   id: string;
   displayName: string;
   color: string;
+  avatar?: string | null;
 };
 
 type DemoState = {
@@ -92,6 +94,7 @@ function accountFor(state: DemoState, identity: DemoIdentity): Account {
     email: identity === 'partner' ? 'partner@demo.local' : 'me@demo.local',
     displayName: member.displayName,
     color: member.color,
+    avatar: member.avatar,
   };
 }
 
@@ -150,12 +153,14 @@ class DemoBackend implements Backend {
         id: state.members.me.id,
         displayName: state.members.me.displayName,
         color: state.members.me.color,
+        avatar: state.members.me.avatar,
         isMe: identity === 'me',
       },
       {
         id: state.members.partner.id,
         displayName: state.members.partner.displayName,
         color: state.members.partner.color,
+        avatar: state.members.partner.avatar,
         isMe: identity === 'partner',
       },
     ];
@@ -177,15 +182,16 @@ class DemoBackend implements Backend {
     throw new Error('演示模式已经有小家了。');
   }
 
-  async updateProfile(account: Account, displayName: string): Promise<Account> {
+  async updateProfile(account: Account, displayName?: string, avatar?: string | null): Promise<Account> {
     const state = readState();
-    const name = displayName.trim().slice(0, 24);
-    if (!name) throw new Error('名字不能为空。');
-    const isPartner = account.userId === state.members.partner.id;
-    if (isPartner) state.members.partner.displayName = name;
-    else state.members.me.displayName = name;
+    const name = displayName?.trim().slice(0, 24);
+    if (name === '') throw new Error('名字不能为空。');
+    if (avatar !== undefined && !isAvatarValue(avatar)) throw new Error('头像格式不支持。');
+    const member = account.userId === state.members.partner.id ? state.members.partner : state.members.me;
+    if (name !== undefined) member.displayName = name;
+    if (avatar !== undefined) member.avatar = avatar;
     saveState(state);
-    return { ...account, displayName: name };
+    return { ...account, displayName: member.displayName, avatar: member.avatar };
   }
 
   async addItem(_householdId: string, input: NewItem): Promise<Item> {

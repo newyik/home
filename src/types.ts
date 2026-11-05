@@ -16,12 +16,14 @@ export type Account = {
   email: string;
   displayName: string;
   color: string;
+  avatar?: string | null;
 };
 
 export type Member = {
   id: string;
   displayName: string;
   color: string;
+  avatar?: string | null;
   isMe: boolean;
 };
 

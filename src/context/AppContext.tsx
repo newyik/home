@@ -39,7 +39,7 @@ type AppContextValue = {
   signOut: () => Promise<void>;
   createHousehold: (name: string, displayName: string) => Promise<void>;
   joinHousehold: (code: string, displayName: string) => Promise<void>;
-  updateProfile: (displayName: string) => Promise<void>;
+  updateProfile: (displayName?: string, avatar?: string | null) => Promise<void>;
   addItem: (input: NewItem) => Promise<Item>;
   updateItem: (id: string, patch: ItemPatch) => Promise<Item>;
   deleteItem: (id: string) => Promise<void>;
@@ -364,19 +364,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
   );
 
   const updateProfile = useCallback(
-    async (displayName: string) => {
+    async (displayName?: string, avatar?: string | null) => {
       if (!account || activeUser.current !== account.userId) throw new Error('登录状态过期了，请重新登录。');
       const request = sessionVersion.current;
-      const updated = await backend.updateProfile(account, displayName);
+      const updated = await backend.updateProfile(account, displayName, avatar);
       if (request !== sessionVersion.current) return;
       setAccount(updated);
       setSessionWorkspace(request, (current) => {
         if (!current) return current;
         const next: Workspace = {
           ...current,
-          me: { ...current.me, displayName: updated.displayName },
+          me: { ...current.me, displayName: updated.displayName, color: updated.color, avatar: updated.avatar },
           members: current.members.map((member) =>
-            member.isMe ? { ...member, displayName: updated.displayName } : member,
+            member.isMe ? { ...member, displayName: updated.displayName, color: updated.color, avatar: updated.avatar } : member,
           ),
         };
         writeCache(updated.userId, next);

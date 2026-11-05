@@ -1,5 +1,6 @@
 import type { Member } from '../types';
 import { cx } from '../lib/utils';
+import { isAvatarValue } from '../lib/avatar';
 
 export function initials(name: string): string {
   const clean = name.trim();
@@ -10,12 +11,14 @@ export function initials(name: string): string {
 export function Avatar({
   name,
   color,
+  avatar,
   size = 36,
   className,
   title,
 }: {
   name: string;
   color: string;
+  avatar?: string | null;
   size?: number;
   className?: string;
   title?: string;
@@ -32,7 +35,11 @@ export function Avatar({
       title={title ?? name}
       aria-label={title ?? name}
     >
-      {initials(name)}
+      {avatar && isAvatarValue(avatar)
+        ? avatar.startsWith('emoji:')
+          ? avatar.slice(6)
+          : <img src={avatar} alt="" className="avatar__image" />
+        : initials(name)}
     </span>
   );
 }
@@ -49,6 +56,7 @@ export function MemberStack({ members, size = 30 }: { members: Member[]; size?: 
           <Avatar
             name={member.displayName}
             color={member.color}
+            avatar={member.avatar}
             size={size}
             title={`${member.displayName}${member.isMe ? '（我）' : ''}`}
           />

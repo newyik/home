@@ -90,7 +90,7 @@ export function Onboarding({ initialCode = '' }: { initialCode?: string }) {
 
           {account ? (
             <div className="onboarding__account">
-              <Avatar name={account.displayName} color={account.color} size={36} />
+              <Avatar name={account.displayName} color={account.color} avatar={account.avatar} size={36} />
               <div>
                 <span>当前登录</span>
                 <strong>{account.email}</strong>

@@ -14,6 +14,10 @@ create table if not exists public.profiles (
   updated_at timestamptz not null default now()
 );
 
+-- Existing profiles keep their name-based avatar until a choice is saved.
+alter table public.profiles add column if not exists avatar text
+  constraint profiles_avatar_size check (avatar is null or octet_length(avatar) <= 160000);
+
 create table if not exists public.households (
   id uuid primary key default gen_random_uuid(),
   name text not null default '我们的小家' check (char_length(name) between 1 and 40),

@@ -5606,3 +5606,52 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* Compact welcome and a softer distinction between daily life and travel. */
+.hub-hero { padding: 14px 20px; gap: 16px; }
+.hub-hero h1 { font-size: clamp(1.35rem, 2.4vw, 1.8rem); line-height: 1.35; margin: 6px 0; }
+.hub-hero h1 em { margin-left: .15em; }
+.hub-hero p { font-size: 12px; line-height: 1.5; }
+.hub-hero .eyebrow { font-size: 11px; }
+.hub-hero__art { width: 115px; }
+.hub-card--trip {
+  color: #344b3b;
+  background: linear-gradient(130deg, #f4f4e9, #e1ead8);
+  border-color: #d4decb;
+  box-shadow: 0 12px 28px #516d4d0d;
+}
+.hub-card--trip:hover { box-shadow: 0 16px 34px #516d4d16; }
+.hub-card--trip .hub-card__label,
+.hub-card--trip .hub-card__body p,
+.hub-card--trip .hub-card__stats span { color: #60705b; }
+.hub-card--trip .hub-card__body h2 em,
+.hub-card--trip .hub-card__cta { color: #4c6b49; }
+.hub-card--trip .hub-card__stats strong { color: #344b3b; }
+.hub-card--trip .hub-card__arrow { color: #4c6b49; background: #d6e3cc; }
+.avatar { overflow: hidden; flex-shrink: 0; }
+.avatar__image { width: 100%; height: 100%; object-fit: cover; display: block; }
+.settings-avatar-button { display: grid; justify-items: center; gap: 5px; flex: none; }
+.settings-avatar-button > span:last-child { font-size: 11px; color: var(--accent-deep); }
+.avatar-picker { padding: 16px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface-2); margin-bottom: 20px; }
+.avatar-picker__preview { display: flex; gap: 14px; align-items: center; margin-bottom: 16px; }
+.avatar-picker__preview p { font-size: 13px; color: var(--ink-soft); }
+.avatar-picker__choices { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.avatar-picker__choices button { width: 44px; min-height: 44px; border: 1px solid var(--line); border-radius: 12px; font-size: 23px; background: var(--surface); }
+.avatar-picker__choices button:first-child { font-size: 12px; }
+.avatar-picker__choices button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 1px var(--accent); }
+.avatar-picker__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.avatar-picker__hint { font-size: 11px; color: var(--ink-soft); line-height: 1.6; margin-top: 12px; }
+@media (min-width: 1000px) {
+  .hub-hero, .hub-grid { max-width: 900px; }
+  .hub-main { gap: 18px; }
+}
+@media (max-width: 640px) {
+  .hub-hero { padding: 10px 14px; gap: 6px; border-radius: 17px; }
+  .hub-hero h1 { font-size: 1.2rem; line-height: 1.4; margin: 4px 0; }
+  .hub-hero p { font-size: 11px; line-height: 1.5; }
+  .hub-hero .eyebrow { font-size: 10px; }
+  .hub-hero__art { width: 62px; margin-right: 0; }
+  .hub-brand strong { font-size: 14px; }
+  .hub-topbar { padding-bottom: 10px; }
+  .hub-main { padding-top: 12px; gap: 13px; }
+}

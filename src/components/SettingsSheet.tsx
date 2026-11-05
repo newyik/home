@@ -15,6 +15,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
 import { Avatar } from './Avatar';
+import { AvatarPicker } from './AvatarPicker';
 import { Sheet } from './Sheet';
 import { ShortcutGuide } from './ShortcutGuide';
 import {
@@ -39,6 +40,7 @@ export function SettingsSheet({ open, onClose }: { open: boolean; onClose: () =>
   } = useApp();
   const { showToast } = useToast();
   const [editingName, setEditingName] = useState(false);
+  const [editingAvatar, setEditingAvatar] = useState(false);
   const [nameDraft, setNameDraft] = useState('');
   const [nameBusy, setNameBusy] = useState(false);
   const [nameError, setNameError] = useState<string | null>(null);
@@ -51,6 +53,7 @@ export function SettingsSheet({ open, onClose }: { open: boolean; onClose: () =>
     if (!open) return;
     setNameDraft(workspace?.me.displayName ?? '');
     setEditingName(false);
+    setEditingAvatar(false);
     setNameError(null);
     setConfirmClear(false);
     setConfirmReset(false);
@@ -172,7 +175,11 @@ export function SettingsSheet({ open, onClose }: { open: boolean; onClose: () =>
         ) : null}
 
         <section className="settings-profile">
-          <Avatar name={workspace.me.displayName} color={workspace.me.color} size={54} />
+          <button type="button" className="settings-avatar-button" onClick={() => setEditingAvatar(value => !value)}
+            aria-expanded={editingAvatar} aria-controls="avatar-editor">
+            <Avatar name={workspace.me.displayName} color={workspace.me.color} avatar={workspace.me.avatar} size={54} />
+            <span>更换头像</span>
+          </button>
           {editingName ? (
             <div className="settings-profile__edit">
               <input
@@ -224,6 +231,15 @@ export function SettingsSheet({ open, onClose }: { open: boolean; onClose: () =>
             </button>
           ) : null}
         </section>
+        {editingAvatar ? (
+          <div id="avatar-editor">
+            <AvatarPicker key={account.userId} member={workspace.me} onSave={async avatar => {
+              await updateProfile(undefined, avatar);
+              setEditingAvatar(false);
+              showToast('新头像已经保存啦。', { tone: 'success' });
+            }} />
+          </div>
+        ) : null}
         {nameError ? (
           <div className="form-alert" role="alert">
             {nameError}
@@ -256,7 +272,7 @@ export function SettingsSheet({ open, onClose }: { open: boolean; onClose: () =>
             <div className="member-list">
               {workspace.members.map((member) => (
                 <div className="member-row" key={member.id}>
-                  <Avatar name={member.displayName} color={member.color} size={32} />
+                  <Avatar name={member.displayName} color={member.color} avatar={member.avatar} size={32} />
                   <span>{member.displayName}</span>
                   {member.isMe ? <em>我</em> : null}
                 </div>
@@ -316,7 +332,7 @@ export function SettingsSheet({ open, onClose }: { open: boolean; onClose: () =>
                     onClick={() => void switchIdentity(identity)}
                     disabled={demoBusy !== null || member.isMe}
                   >
-                    <Avatar name={member.displayName} color={member.color} size={30} />
+                    <Avatar name={member.displayName} color={member.color} avatar={member.avatar} size={30} />
                     <span>{member.displayName}</span>
                     {demoBusy === identity ? (
                       <LoaderCircle size={15} className="spin" />

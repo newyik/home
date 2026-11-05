@@ -246,7 +246,7 @@ export function Home() {
             onClick={() => setSettingsOpen(true)}
             aria-label="打开设置"
           >
-            <Avatar name={workspace.me.displayName} color={workspace.me.color} size={38} />
+            <Avatar name={workspace.me.displayName} color={workspace.me.color} avatar={workspace.me.avatar} size={38} />
             <span className="avatar-button__badge">
               <Settings2 size={10} />
             </span>
