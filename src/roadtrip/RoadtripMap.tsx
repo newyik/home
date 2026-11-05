@@ -161,7 +161,7 @@ export function RoadtripMap({ places, picking, onSelect, onPick, onCancelPick }:
 
   return (
     <div className={`rt-map${picking ? ' is-picking' : ''}`}>
-      <div ref={containerRef} className="rt-map__canvas" aria-label="日本自驾打卡地图" />
+      <div ref={containerRef} className="rt-map__canvas" aria-label="日本旅行打卡地图" />
 
       <div className="rt-map__legend" aria-hidden="true">
         <span>

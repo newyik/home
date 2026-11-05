@@ -386,7 +386,7 @@ create trigger items_set_author
   before insert or update on public.items
   for each row execute function public.handle_item_author();
 
--- ---------- 自驾地点作者 / 打卡信息 ----------
+-- ---------- 旅行地点作者 / 打卡信息 ----------
 
 create or replace function public.handle_place_author()
 returns trigger

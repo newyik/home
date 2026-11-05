@@ -26,7 +26,7 @@
 
 一个只属于你们两个人的小网站。登录后先看到两个入口：
 
-- **自驾打卡**：去过的地方钉在日本地图上，计划去的地方先插一面小旗。
+- **旅行打卡**：去过的地方钉在日本地图上，计划去的地方先插一面小旗。
 - **一起买**：两个人共享的采购清单，谁加了什么、谁买好了都看得见。
 
 再具体一点：
@@ -40,21 +40,21 @@
 - **可以添加到主屏幕**：像一个 App 一样使用。
 - **支持 iOS 快捷指令**：一按打开清单，或者说一句「家里缺牛奶」就加进去。
 
-## 自驾打卡
+## 旅行打卡
 
-首页第一张卡片就是「自驾打卡」。点进去是一张属于你们两个人的日本地图。
+首页的「旅行打卡」卡片点进去，是一张属于你们两个人的日本地图。
 
-![自驾打卡手机端](docs/screenshots/roadtrip-mobile.png)
+![旅行打卡手机端](docs/screenshots/roadtrip-mobile.png)
 
 <p align="center">
-  <img src="docs/screenshots/roadtrip-desktop.png" width="82%" alt="自驾打卡桌面端" />
+  <img src="docs/screenshots/roadtrip-desktop.png" width="82%" alt="旅行打卡桌面端" />
 </p>
 
-- 入口：首页的「自驾打卡」卡片，或直接访问 `/#/roadtrip`
+- 入口：首页的「旅行打卡」卡片，或直接访问 `/#/roadtrip`
 - 日本地图：Leaflet + 日本国土地理院淡色地图，不需要 API key
 - 去过的地方用珊瑚色图钉，计划去的地方用蓝色图钉
 - 支持地图聚合、放大地图看单个图钉、「全图」查看冲绳
-- 内置 100+ 个日本常见自驾地点，支持中文 / 日文搜索
+- 内置 100+ 个日本常见旅行地点，支持中文 / 日文搜索
 - 搜不到的地点可以点「在日本地图上搜索」，通过 OpenStreetMap 在线补全（需要联网）
 - 也可以直接在地图上点选自定义位置
 - 计划 ↔ 去过随时切换，记录日期、评分、备注
@@ -128,7 +128,7 @@ npm run dev
 - `households`：小家
 - `household_members`：谁属于哪个小家
 - `items`：清单内容
-- `roadtrip_places`：自驾地图上的去过 / 计划地点
+- `roadtrip_places`：旅行地图上的去过 / 计划地点
 - 行级安全策略（RLS）
 - 创建 / 加入小家的函数
 - 自动记录「谁添加、谁买好」的触发器
@@ -321,7 +321,7 @@ https://yourname.github.io/home/?add=牛奶&quick=1#/shopping
 
 ## 数据和隐私
 
-- 清单和自驾地图数据存在你自己的 Supabase 项目里，不在第三方广告平台。
+- 清单和旅行地图数据存在你自己的 Supabase 项目里，不在第三方广告平台。
 - 前端只带 anon key；所有表都开启了 RLS。
 - 只有 `household_members` 里的成员才能读取对应小家的清单和地图。
 - 邀请码是加入小家的唯一凭证，只发给 TA，不要发到群里。
@@ -359,7 +359,7 @@ Supabase 的 API 缓存有时需要几秒钟刷新。等 10 秒，或者在 **Pr
 - 检查 Supabase 项目是否处于 paused 状态，免费项目长时间不用会被暂停。
 - 应用每 45 秒会轮询一次；手动点顶部的「已同步」也能立即刷新。
 
-**自驾页面打不开，提示找不到 `roadtrip_places`**
+**旅行页面打不开，提示找不到 `roadtrip_places`**
 
 说明 Supabase 还没有升级到新版表结构。重新打开 SQL Editor，把最新的 [`supabase/schema.sql`](supabase/schema.sql) 再运行一次即可，购物清单不会被清空。
 
@@ -411,7 +411,7 @@ npm run icons      # 重新生成 PWA 图标
 │   │   ├── demo.ts                # 本地演示后端
 │   │   ├── supabase.ts            # Supabase 客户端
 │   │   └── utils.ts               # 时间、分类、深链等工具
-│   ├── roadtrip/                  # 自驾打卡：地图、日本地点库、seed
+│   ├── roadtrip/                  # 旅行打卡：地图、日本地点库、seed
 │   ├── App.tsx
 │   └── styles.css
 ├── supabase/schema.sql            # 数据库、RLS、RPC、Realtime

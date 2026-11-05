@@ -170,7 +170,7 @@ export function Hub() {
             <div className="hub-card__top">
               <span className="hub-card__label">
                 <Car size={15} />
-                自驾打卡
+                旅行打卡
               </span>
               <span className="hub-card__arrow">
                 <ArrowUpRight size={18} />
@@ -206,7 +206,7 @@ export function Hub() {
             </div>
 
             <span className="hub-card__cta">
-              打开日本地图
+              打开旅行地图
               <ArrowRight size={15} />
             </span>
           </button>

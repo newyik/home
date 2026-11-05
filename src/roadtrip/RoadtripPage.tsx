@@ -143,7 +143,7 @@ export function RoadtripPage({ onBack }: { onBack: () => void }) {
         <div className="rt-brand">
           <LogoMark size={34} />
           <div>
-            <strong>自驾打卡</strong>
+            <strong>旅行打卡</strong>
             <small>{workspace?.household.name ?? '我们的小家'}</small>
           </div>
         </div>
@@ -168,7 +168,7 @@ export function RoadtripPage({ onBack }: { onBack: () => void }) {
           <div className="rt-hero__copy">
             <span className="eyebrow eyebrow--accent">
               <Car size={13} />
-              两个人的日本自驾地图
+              旅行打卡地图
             </span>
             <h1>
               收藏沿途风景，
@@ -181,11 +181,11 @@ export function RoadtripPage({ onBack }: { onBack: () => void }) {
           <div className="rt-hero__stamp" aria-hidden="true">
             <Compass size={20} />
             <strong>日本</strong>
-            <span>自驾</span>
+            <span>旅行</span>
           </div>
         </section>
 
-        <section className="rt-stats" aria-label="自驾统计">
+        <section className="rt-stats" aria-label="旅行打卡统计">
           <div className="rt-stat rt-stat--visited">
             <span className="rt-stat__icon">
               <CircleCheck size={18} />

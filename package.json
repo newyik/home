@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "小家控 —— 两个人的小家：共享采购清单与日本自驾打卡",
+  "description": "小家控 —— 两个人的小家：共享采购清单与日本旅行打卡",
   "scripts": {
     "dev": "vite",
     "build": "tsc -p tsconfig.json --noEmit && vite build",

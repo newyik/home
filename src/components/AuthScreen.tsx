@@ -156,7 +156,7 @@ export function AuthScreen({ inviteCode, onInviteCodeChange }: {
               <MapPinned size={15} />
             </span>
             <div>
-              <strong>自驾打卡</strong>
+              <strong>旅行打卡</strong>
               <span>去过的地方，钉在日本地图上</span>
             </div>
             <span className="preview-tag preview-tag--gold">地图</span>
