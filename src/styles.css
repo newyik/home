@@ -5339,3 +5339,49 @@ p {
     justify-content: center;
   }
 }
+
+.auth-preview__feature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid #f0e7dc;
+}
+
+.auth-preview__feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 9px;
+  color: var(--accent-deep);
+  background: var(--accent-soft);
+}
+
+.auth-preview__feature-icon--map {
+  color: #4f8563;
+  background: #e8f1e9;
+}
+
+.auth-preview__feature > div {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.auth-preview__feature strong {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.auth-preview__feature > div span {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 9.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

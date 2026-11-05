@@ -38,8 +38,6 @@ import {
 
 type Filter = 'all' | 'todo' | 'done';
 
-const SUGGESTIONS = ['洗衣液', '牛奶', '垃圾袋', '纸巾'];
-
 export function Home() {
   const { workspace, demoMode, syncStatus, offline, addItem, updateItem, deleteItem, refresh } =
     useApp();
@@ -315,7 +313,7 @@ export function Home() {
               type="text"
               value={quickName}
               onChange={(event) => setQuickName(event.target.value)}
-              placeholder="家里缺什么？比如：洗衣液"
+              placeholder="家里缺什么？"
               maxLength={80}
               enterKeyHint="done"
               aria-label="快速添加物品"
@@ -336,21 +334,7 @@ export function Home() {
                 会放进「{CATEGORY_MAP[quickCategory].label}」，添加后还能改
               </span>
             ) : (
-              <>
-                <span className="quick-add__label">常买</span>
-                <div className="quick-add__suggestions">
-                  {SUGGESTIONS.map((suggestion) => (
-                    <button
-                      key={suggestion}
-                      type="button"
-                      onClick={() => void addQuick(suggestion)}
-                      disabled={adding}
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
-              </>
+              <span className="quick-add__label">从第一件东西开始</span>
             )}
             <button
               type="button"

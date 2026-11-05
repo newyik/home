@@ -129,7 +129,7 @@ export function SettingsSheet({ open, onClose }: { open: boolean; onClose: () =>
     setDemoBusy(identity);
     try {
       await switchDemoIdentity(identity);
-      showToast(identity === 'me' ? '已切换到小雨的视角。' : '已切换到阿哲的视角。', {
+      showToast(identity === 'me' ? '已切换到我的视角。' : '已切换到 TA 的视角。', {
         tone: 'info',
       });
     } finally {

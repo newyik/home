@@ -5,8 +5,10 @@ import {
   Eye,
   EyeOff,
   LoaderCircle,
+  MapPinned,
   LockKeyhole,
   Mail,
+  ShoppingBag,
   Sparkles,
   UserRound,
 } from 'lucide-react';
@@ -120,43 +122,33 @@ export function AuthScreen() {
           <div className="auth-preview__head">
             <div>
               <span className="auth-preview__eyebrow">我们的小家</span>
-              <strong>周末采购</strong>
+              <strong>一起买，也一起去</strong>
             </div>
             <div className="auth-preview__people">
-              <Avatar name="小雨" color="#d9613d" size={26} />
-              <Avatar name="阿哲" color="#5b84d7" size={26} />
+              <Avatar name="我" color="#d9613d" size={26} />
+              <Avatar name="TA" color="#5b84d7" size={26} />
             </div>
           </div>
 
-          <div className="auth-preview__item">
-            <span className="preview-check" />
-            <div>
-              <strong>洗衣液</strong>
-              <span>2 瓶 · 补充装</span>
-            </div>
-            <span className="preview-tag preview-tag--green">清洁</span>
-          </div>
-          <div className="auth-preview__item">
-            <span className="preview-check" />
-            <div>
-              <strong>牛奶</strong>
-              <span>低脂的，早餐喝</span>
-            </div>
-            <span className="preview-tag preview-tag--gold">食品</span>
-          </div>
-          <div className="auth-preview__item auth-preview__item--done">
-            <span className="preview-check preview-check--done">
-              <Check size={12} strokeWidth={3} />
+          <div className="auth-preview__feature">
+            <span className="auth-preview__feature-icon">
+              <ShoppingBag size={15} />
             </span>
             <div>
-              <strong>垃圾袋</strong>
-              <span>阿哲 买好了</span>
+              <strong>一起买</strong>
+              <span>家里缺什么，记在这里</span>
             </div>
+            <span className="preview-tag preview-tag--green">清单</span>
           </div>
-
-          <div className="auth-preview__add">
-            <span>＋</span>
-            家里缺什么？
+          <div className="auth-preview__feature">
+            <span className="auth-preview__feature-icon auth-preview__feature-icon--map">
+              <MapPinned size={15} />
+            </span>
+            <div>
+              <strong>自驾打卡</strong>
+              <span>去过的地方，钉在日本地图上</span>
+            </div>
+            <span className="preview-tag preview-tag--gold">地图</span>
           </div>
           <span className="auth-preview__sticker">2 人同步</span>
         </div>
@@ -191,10 +183,10 @@ export function AuthScreen() {
                   onClick={() => handleDemo('me')}
                   disabled={demoBusy !== null}
                 >
-                  <Avatar name="小雨" color="#d9613d" size={44} />
+                  <Avatar name="我" color="#d9613d" size={44} />
                   <span>
-                    <strong>以「小雨」进入</strong>
-                    <small>看看她眼里的清单</small>
+                    <strong>以我的身份进入</strong>
+                    <small>先看看自己眼里的清单</small>
                   </span>
                   {demoBusy === 'me' ? (
                     <LoaderCircle size={18} className="spin" />
@@ -208,9 +200,9 @@ export function AuthScreen() {
                   onClick={() => handleDemo('partner')}
                   disabled={demoBusy !== null}
                 >
-                  <Avatar name="阿哲" color="#5b84d7" size={44} />
+                  <Avatar name="TA" color="#5b84d7" size={44} />
                   <span>
-                    <strong>以「阿哲」进入</strong>
+                    <strong>以 TA 的身份进入</strong>
                     <small>切换身份看看同一份清单</small>
                   </span>
                   {demoBusy === 'partner' ? (
@@ -284,7 +276,7 @@ export function AuthScreen() {
                         type="text"
                         value={displayName}
                         onChange={(event) => setDisplayName(event.target.value)}
-                        placeholder="比如：小雨"
+                        placeholder="TA 怎么称呼你？"
                         autoComplete="nickname"
                         maxLength={24}
                       />

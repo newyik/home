@@ -9,12 +9,11 @@ import type {
   Workspace,
 } from '../types';
 import { prefectureFor } from '../roadtrip/prefectures';
-import { seedRoadtripPlaces } from '../roadtrip/seed';
 import { todayISO } from '../roadtrip/dates';
 import type { RoadtripPlace, RoadtripPlaceInput } from '../roadtrip/types';
 import type { Backend, DemoIdentity } from './backend';
 
-const STORAGE_KEY = 'together-demo-v2';
+const STORAGE_KEY = 'together-demo-v3';
 
 type DemoMember = {
   id: string;
@@ -23,7 +22,7 @@ type DemoMember = {
 };
 
 type DemoState = {
-  version: 2;
+  version: 3;
   entered: boolean;
   identity: DemoIdentity;
   household: Household;
@@ -35,128 +34,23 @@ type DemoState = {
   places: RoadtripPlace[];
 };
 
-function minutesAgo(minutes: number): string {
-  return new Date(Date.now() - minutes * 60_000).toISOString();
-}
-
 function seedState(): DemoState {
-  const me: DemoMember = { id: 'demo-me', displayName: '小雨', color: '#d9613d' };
-  const partner: DemoMember = { id: 'demo-partner', displayName: '阿哲', color: '#5b84d7' };
-
-  const items: Item[] = [
-    {
-      id: 'demo-1',
-      name: '洗发水',
-      quantity: '1',
-      note: '无硅油的',
-      category: 'daily',
-      done: false,
-      createdBy: partner.id,
-      createdByName: partner.displayName,
-      completedByName: null,
-      createdAt: minutesAgo(35),
-      completedAt: null,
-      updatedAt: minutesAgo(35),
-    },
-    {
-      id: 'demo-2',
-      name: '洗衣液',
-      quantity: '2',
-      note: '补充装',
-      category: 'clean',
-      done: false,
-      createdBy: me.id,
-      createdByName: me.displayName,
-      completedByName: null,
-      createdAt: minutesAgo(180),
-      completedAt: null,
-      updatedAt: minutesAgo(180),
-    },
-    {
-      id: 'demo-3',
-      name: '牛奶',
-      quantity: '2',
-      note: '低脂的',
-      category: 'food',
-      done: false,
-      createdBy: me.id,
-      createdByName: me.displayName,
-      completedByName: null,
-      createdAt: minutesAgo(60 * 20),
-      completedAt: null,
-      updatedAt: minutesAgo(60 * 20),
-    },
-    {
-      id: 'demo-4',
-      name: '纸巾',
-      quantity: '1',
-      note: '抽纸，放客厅',
-      category: 'daily',
-      done: false,
-      createdBy: partner.id,
-      createdByName: partner.displayName,
-      completedByName: null,
-      createdAt: minutesAgo(60 * 30),
-      completedAt: null,
-      updatedAt: minutesAgo(60 * 30),
-    },
-    {
-      id: 'demo-5',
-      name: '垃圾袋',
-      quantity: '1',
-      note: null,
-      category: 'daily',
-      done: true,
-      createdBy: partner.id,
-      createdByName: partner.displayName,
-      completedByName: me.displayName,
-      createdAt: minutesAgo(60 * 40),
-      completedAt: minutesAgo(60 * 22),
-      updatedAt: minutesAgo(60 * 22),
-    },
-    {
-      id: 'demo-6',
-      name: '维生素 C',
-      quantity: '1',
-      note: null,
-      category: 'medicine',
-      done: true,
-      createdBy: me.id,
-      createdByName: me.displayName,
-      completedByName: partner.displayName,
-      createdAt: minutesAgo(60 * 70),
-      completedAt: minutesAgo(60 * 48),
-      updatedAt: minutesAgo(60 * 48),
-    },
-    {
-      id: 'demo-7',
-      name: '酱油',
-      quantity: '1',
-      note: '生抽',
-      category: 'food',
-      done: false,
-      createdBy: partner.id,
-      createdByName: partner.displayName,
-      completedByName: null,
-      createdAt: minutesAgo(60 * 55),
-      completedAt: null,
-      updatedAt: minutesAgo(60 * 55),
-    },
-  ];
+  const me: DemoMember = { id: 'demo-me-v3', displayName: '我', color: '#d9613d' };
+  const partner: DemoMember = { id: 'demo-partner-v3', displayName: 'TA', color: '#5b84d7' };
 
   return {
-    version: 2,
+    version: 3,
     entered: false,
     identity: 'me',
     household: {
-      id: 'demo-household',
+      id: 'demo-household-v3',
       name: '我们的小家',
-      inviteCode: 'H8M2K6',
-      createdAt: minutesAgo(60 * 24 * 30),
+      inviteCode: 'DEMO01',
+      createdAt: new Date().toISOString(),
     },
     members: { me, partner },
-    items,
-    places: seedRoadtripPlaces(),
+    items: [],
+    places: [],
   };
 }
 
@@ -165,22 +59,13 @@ function readState(): DemoState {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as DemoState;
-      if (parsed.version === 2 && parsed.household && parsed.members && Array.isArray(parsed.items)) {
-        if (!Array.isArray(parsed.places)) {
-          let oldPlaces: RoadtripPlace[] | null = null;
-          try {
-            const rawRoadtrip = localStorage.getItem('together-roadtrip-demo-v1');
-            if (rawRoadtrip) {
-              const oldStore = JSON.parse(rawRoadtrip) as { places?: RoadtripPlace[] };
-              if (Array.isArray(oldStore.places)) oldPlaces = oldStore.places;
-            }
-          } catch {
-            // Fall back to the seeded preview places.
-          }
-          const migrated: DemoState = { ...parsed, places: oldPlaces ?? seedRoadtripPlaces() };
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
-          return migrated;
-        }
+      if (
+        parsed.version === 3 &&
+        parsed.household &&
+        parsed.members &&
+        Array.isArray(parsed.items) &&
+        Array.isArray(parsed.places)
+      ) {
         return parsed;
       }
     }
