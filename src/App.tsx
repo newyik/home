@@ -22,7 +22,7 @@ function Splash() {
         <LogoMark size={68} />
         <span className="splash__ring" />
       </div>
-      <strong>一起买</strong>
+      <strong>小家控</strong>
       <span>正在打开你们的小家…</span>
     </div>
   );

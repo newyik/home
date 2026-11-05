@@ -62,7 +62,7 @@ export function ShortcutGuide() {
         <ol className="steps">
           <li>打开 iPhone 的「快捷指令」App，点右上角「＋」。</li>
           <li>搜索「打开 URL」，把上面的链接粘进去。</li>
-          <li>命名为「一起买」，换成购物袋图标，添加到主屏幕。</li>
+          <li>命名为「小家控」，换成购物袋图标，添加到主屏幕。</li>
         </ol>
       </div>
 

@@ -146,7 +146,7 @@ export function AuthScreen({ inviteCode, onInviteCodeChange }: {
               <ShoppingBag size={15} />
             </span>
             <div>
-              <strong>一起买</strong>
+              <strong>小家控</strong>
               <span>家里缺什么，记在这里</span>
             </div>
             <span className="preview-tag preview-tag--green">清单</span>

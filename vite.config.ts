@@ -12,8 +12,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icons/apple-touch-icon.png'],
       manifest: {
-        name: '一起买 · 两个人的小家',
-        short_name: '一起买',
+        name: '小家控',
+        short_name: '小家控',
         description: '把家里缺的东西记在一起，把去过的地方钉在日本地图上。',
         lang: 'zh-CN',
         theme_color: '#f8f3ec',

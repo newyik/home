@@ -38,7 +38,7 @@ export function RecoveryScreen() {
       <div className="recovery__brand">
         <LogoMark size={46} />
         <div>
-          <strong>一起买</strong>
+          <strong>小家控</strong>
           <span>重新设置密码</span>
         </div>
       </div>

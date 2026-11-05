@@ -88,7 +88,7 @@ export function SettingsSheet({ open, onClose }: { open: boolean; onClose: () =>
     const text = `来加入「${workspace.household.name}」的采购清单吧。邀请码：${workspace.household.inviteCode}`;
     if (navigator.share) {
       try {
-        await navigator.share({ title: '一起买', text, url: invitationUrl(workspace.household.inviteCode) });
+        await navigator.share({ title: '小家控', text, url: invitationUrl(workspace.household.inviteCode) });
         return;
       } catch {
         return;
@@ -386,7 +386,7 @@ export function SettingsSheet({ open, onClose }: { open: boolean; onClose: () =>
           <span className="settings-footer__mark">
             <UserRound size={14} />
           </span>
-          <span>一起买 · 两个人，刚刚好</span>
+          <span>小家控 · 两个人，刚刚好</span>
           <span className="settings-footer__version">v1.0</span>
         </div>
 

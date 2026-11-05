@@ -49,7 +49,7 @@ export function Logo({
     <div className={cx('logo', className)}>
       <LogoMark size={size} />
       <div className="logo__text">
-        <span className="logo__name">一起买</span>
+        <span className="logo__name">小家控</span>
         {subtitle ? <span className="logo__subtitle">{subtitle}</span> : null}
       </div>
     </div>
