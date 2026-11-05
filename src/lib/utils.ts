@@ -281,6 +281,7 @@ export function friendlyAuthError(message: string): string {
 }
 
 export function friendlyWorkspaceError(message: string): string {
+  if (message.includes('household_full')) return '这个小家已经有两个人了，无法再加入。';
   if (message.includes('already_in_household')) return '你已经在另一个小家里了。';
   if (message.includes('invalid_code')) return '邀请码不对，再核对一下。';
   if (message.includes('not authenticated')) return '登录状态过期了，请重新登录。';

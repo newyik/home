@@ -84,6 +84,31 @@ create table if not exists public.roadtrip_places (
 create index if not exists roadtrip_places_household_idx
   on public.roadtrip_places (household_id, status, created_at desc);
 
+-- Serialize membership inserts on the household row, including simultaneous joins.
+create or replace function public.enforce_household_capacity()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if tg_op = 'UPDATE' and new.household_id = old.household_id then
+    return new;
+  end if;
+  perform 1 from public.households where id = new.household_id for update;
+  if (select count(*) from public.household_members where household_id = new.household_id) >= 2 then
+    raise exception 'household_full';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists household_capacity on public.household_members;
+create trigger household_capacity
+  before insert or update of household_id on public.household_members
+  for each row execute function public.enforce_household_capacity();
+revoke all on function public.enforce_household_capacity() from public, anon, authenticated;
+
 -- ---------- 通用 updated_at ----------
 
 create or replace function public.set_updated_at()

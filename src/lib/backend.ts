@@ -213,6 +213,7 @@ function mapHousehold(row: HouseholdRow): Household {
 
 class SupabaseBackend implements Backend {
   kind = 'supabase' as const;
+  private authGeneration = 0;
 
   private get client() {
     if (!supabase) throw new Error('Supabase 还没有配置。');
@@ -284,6 +285,7 @@ class SupabaseBackend implements Backend {
   onAuthStateChange(handler: (account: Account | null, event: AuthEvent) => void): () => void {
     const { data } = this.client.auth.onAuthStateChange((event, session) => {
       if (event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') return;
+      const request = ++this.authGeneration;
       if (!session?.user) {
         clearCachedAccount();
         handler(null, 'signed_out');
@@ -291,10 +293,17 @@ class SupabaseBackend implements Backend {
       }
       const authEvent: AuthEvent = event === 'PASSWORD_RECOVERY' ? 'recovery' : 'signed_in';
       void this.accountForUser(session.user)
-        .then((account) => handler(account, authEvent))
-        .catch(() => handler(null, 'signed_out'));
+        .then((account) => {
+          if (request === this.authGeneration) handler(account, authEvent);
+        })
+        .catch(() => {
+          if (request === this.authGeneration) handler(null, 'signed_out');
+        });
     });
-    return () => data.subscription.unsubscribe();
+    return () => {
+      this.authGeneration++;
+      data.subscription.unsubscribe();
+    };
   }
 
   async signIn(email: string, password: string): Promise<Account> {
@@ -344,6 +353,7 @@ class SupabaseBackend implements Backend {
   }
 
   async signOut(): Promise<void> {
+    this.authGeneration++;
     const { error } = await this.client.auth.signOut();
     if (error) throw new Error(error.message);
     clearCachedAccount();

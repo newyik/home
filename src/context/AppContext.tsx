@@ -103,6 +103,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [initError, setInitError] = useState<string | null>(null);
   const [recovery, setRecovery] = useState(false);
   const loadSequence = useRef(0);
+  const sessionVersion = useRef(0);
+  const activeUser = useRef<string | null>(null);
+
+  const clearSession = useCallback(() => {
+    sessionVersion.current++;
+    loadSequence.current++;
+    activeUser.current = null;
+    setAccount(null);
+    setWorkspace(null);
+    setPhase('signedOut');
+    setSyncStatus('idle');
+    setRecovery(false);
+    setOffline(false);
+  }, []);
+
+  const setSessionWorkspace = useCallback((
+    request: number,
+    change: (current: Workspace | null) => Workspace | null,
+  ) => {
+    setWorkspace(current => request === sessionVersion.current ? change(current) : current);
+  }, []);
 
   const applyWorkspace = useCallback((next: Workspace | null, userId: string) => {
     setWorkspace(next);
@@ -117,6 +138,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const loadAccountWorkspace = useCallback(
     async (nextAccount: Account, options: { allowCache?: boolean } = {}) => {
+      if (activeUser.current !== nextAccount.userId) {
+        sessionVersion.current++;
+        activeUser.current = nextAccount.userId;
+        setWorkspace(null);
+        setPhase('loading');
+        setRecovery(false);
+        setOffline(false);
+      }
       const sequence = ++loadSequence.current;
       setAccount(nextAccount);
       setInitError(null);
@@ -146,10 +175,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   );
 
   const bootstrap = useCallback(async () => {
+    const request = sessionVersion.current;
     setPhase('loading');
     setInitError(null);
     try {
       const restored = await backend.restore();
+      if (request !== sessionVersion.current) return;
       if (!restored) {
         setAccount(null);
         setWorkspace(null);
@@ -158,6 +189,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
       await loadAccountWorkspace(restored);
     } catch (error) {
+      if (request !== sessionVersion.current) return;
       const message = error instanceof Error ? error.message : '打开失败。';
       setPhase('error');
       setInitError(friendlyAuthError(message));
@@ -166,32 +198,32 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     void bootstrap();
+    return () => { sessionVersion.current++; loadSequence.current++; };
   }, [bootstrap]);
 
   useEffect(() => {
     const unsubscribe = backend.onAuthStateChange((nextAccount, event) => {
       if (!nextAccount) {
-        setAccount(null);
-        setWorkspace(null);
-        setPhase('signedOut');
-        setSyncStatus('idle');
-        setRecovery(false);
+        clearSession();
         return;
       }
       void loadAccountWorkspace(nextAccount).then(() => {
-        if (event === 'recovery') setRecovery(true);
+        if (event === 'recovery' && activeUser.current === nextAccount.userId) setRecovery(true);
       });
     });
     return unsubscribe;
-  }, [loadAccountWorkspace]);
+  }, [clearSession, loadAccountWorkspace]);
 
   const refresh = useCallback(async () => {
-    if (!account) return;
+    if (!account || activeUser.current !== account.userId) return;
+    const request = sessionVersion.current;
+    const sequence = ++loadSequence.current;
     setSyncStatus('syncing');
     try {
       const next = await backend.loadWorkspace(account);
+      if (request !== sessionVersion.current || sequence !== loadSequence.current) return;
       if (next) {
-        setWorkspace((current) => {
+        setSessionWorkspace(request, (current) => {
           if (!current) return next;
           const pending = current.items.filter((item) => item.pending);
           const realIds = new Set(next.items.map((item) => item.id));
@@ -211,9 +243,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
       setSyncStatus('idle');
     } catch {
+      if (request !== sessionVersion.current || sequence !== loadSequence.current) return;
       setSyncStatus('error');
     }
-  }, [account]);
+  }, [account, setSessionWorkspace]);
 
   const householdId = workspace?.household.id;
 
@@ -249,8 +282,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(
     async (email: string, password: string) => {
+      const request = sessionVersion.current;
       try {
         const nextAccount = await backend.signIn(email, password);
+        if (request !== sessionVersion.current && activeUser.current !== nextAccount.userId) return;
         await loadAccountWorkspace(nextAccount);
       } catch (error) {
         throw new Error(friendlyAuthError(error instanceof Error ? error.message : '登录失败。'));
@@ -261,8 +296,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const signUp = useCallback(
     async (email: string, password: string, displayName: string) => {
+      const request = sessionVersion.current;
       try {
         const result = await backend.signUp(email, password, displayName);
+        if (request !== sessionVersion.current && activeUser.current !== result.account?.userId) {
+          return { needsConfirmation: result.needsConfirmation };
+        }
         if (result.account) await loadAccountWorkspace(result.account);
         return { needsConfirmation: result.needsConfirmation };
       } catch (error) {
@@ -281,8 +320,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const updatePassword = useCallback(async (password: string) => {
+    const request = sessionVersion.current;
     try {
       await backend.updatePassword(password);
+      if (request !== sessionVersion.current) return;
       setRecovery(false);
     } catch (error) {
       throw new Error(friendlyAuthError(error instanceof Error ? error.message : '密码更新失败。'));
@@ -292,19 +333,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const cancelRecovery = useCallback(() => setRecovery(false), []);
 
   const signOut = useCallback(async () => {
+    clearSession();
     await backend.signOut();
-    setAccount(null);
-    setWorkspace(null);
-    setPhase('signedOut');
-    setSyncStatus('idle');
-    setRecovery(false);
-  }, []);
+  }, [clearSession]);
 
   const createHousehold = useCallback(
     async (name: string, displayName: string) => {
-      if (!account) throw new Error('登录状态过期了，请重新登录。');
+      if (!account || activeUser.current !== account.userId) throw new Error('登录状态过期了，请重新登录。');
+      const request = sessionVersion.current;
       const next = await backend.createHousehold(account, name, displayName);
       const updatedAccount = { ...account, displayName: next.me.displayName };
+      if (request !== sessionVersion.current) return;
       setAccount(updatedAccount);
       applyWorkspace(next, updatedAccount.userId);
     },
@@ -313,9 +352,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const joinHousehold = useCallback(
     async (code: string, displayName: string) => {
-      if (!account) throw new Error('登录状态过期了，请重新登录。');
+      if (!account || activeUser.current !== account.userId) throw new Error('登录状态过期了，请重新登录。');
+      const request = sessionVersion.current;
       const next = await backend.joinHousehold(account, code, displayName);
       const updatedAccount = { ...account, displayName: next.me.displayName };
+      if (request !== sessionVersion.current) return;
       setAccount(updatedAccount);
       applyWorkspace(next, updatedAccount.userId);
     },
@@ -324,10 +365,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const updateProfile = useCallback(
     async (displayName: string) => {
-      if (!account) throw new Error('登录状态过期了，请重新登录。');
+      if (!account || activeUser.current !== account.userId) throw new Error('登录状态过期了，请重新登录。');
+      const request = sessionVersion.current;
       const updated = await backend.updateProfile(account, displayName);
+      if (request !== sessionVersion.current) return;
       setAccount(updated);
-      setWorkspace((current) => {
+      setSessionWorkspace(request, (current) => {
         if (!current) return current;
         const next: Workspace = {
           ...current,
@@ -340,12 +383,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         return next;
       });
     },
-    [account],
+    [account, setSessionWorkspace],
   );
 
   const addItem = useCallback(
     async (input: NewItem) => {
-      if (!workspace || !account) throw new Error('登录状态过期了，请重新登录。');
+      if (!workspace || !account || activeUser.current !== account.userId) throw new Error('登录状态过期了，请重新登录。');
+      const request = sessionVersion.current;
       const now = new Date().toISOString();
       const tempId = makeTempId();
       const temp: Item = {
@@ -364,13 +408,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         pending: true,
       };
 
-      setWorkspace((current) =>
+      setSessionWorkspace(request, (current) =>
         current ? { ...current, items: [temp, ...current.items] } : current,
       );
 
       try {
         const real = await backend.addItem(workspace.household.id, input);
-        setWorkspace((current) => {
+        setSessionWorkspace(request, (current) => {
           if (!current) return current;
           const next = {
             ...current,
@@ -381,18 +425,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
         });
         return real;
       } catch (error) {
-        setWorkspace((current) =>
+        setSessionWorkspace(request, (current) =>
           current ? { ...current, items: current.items.filter((item) => item.id !== tempId) } : current,
         );
         throw error;
       }
     },
-    [account, workspace],
+    [account, workspace, setSessionWorkspace],
   );
 
   const updateItem = useCallback(
     async (id: string, patch: ItemPatch) => {
-      if (!workspace || !account) throw new Error('登录状态过期了，请重新登录。');
+      if (!workspace || !account || activeUser.current !== account.userId) throw new Error('登录状态过期了，请重新登录。');
+      const request = sessionVersion.current;
       const previous = workspace.items.find((item) => item.id === id);
       if (!previous) throw new Error('这件东西找不到了。');
 
@@ -415,7 +460,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         updatedAt: now,
       };
 
-      setWorkspace((current) =>
+      setSessionWorkspace(request, (current) =>
         current
           ? { ...current, items: current.items.map((item) => (item.id === id ? optimistic : item)) }
           : current,
@@ -423,7 +468,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
       try {
         const real = await backend.updateItem(id, patch);
-        setWorkspace((current) => {
+        setSessionWorkspace(request, (current) => {
           if (!current) return current;
           const next = {
             ...current,
@@ -434,7 +479,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         });
         return real;
       } catch (error) {
-        setWorkspace((current) =>
+        setSessionWorkspace(request, (current) =>
           current
             ? {
                 ...current,
@@ -445,53 +490,56 @@ export function AppProvider({ children }: { children: ReactNode }) {
         throw error;
       }
     },
-    [account, workspace],
+    [account, workspace, setSessionWorkspace],
   );
 
   const deleteItem = useCallback(
     async (id: string) => {
-      if (!workspace || !account) throw new Error('登录状态过期了，请重新登录。');
+      if (!workspace || !account || activeUser.current !== account.userId) throw new Error('登录状态过期了，请重新登录。');
+      const request = sessionVersion.current;
       const snapshot = workspace.items;
-      setWorkspace((current) =>
+      setSessionWorkspace(request, (current) =>
         current ? { ...current, items: current.items.filter((item) => item.id !== id) } : current,
       );
       try {
         await backend.deleteItem(id);
-        setWorkspace((current) => {
+        setSessionWorkspace(request, (current) => {
           if (!current) return current;
           writeCache(account.userId, current);
           return current;
         });
       } catch (error) {
-        setWorkspace((current) => (current ? { ...current, items: snapshot } : current));
+        setSessionWorkspace(request, (current) => (current ? { ...current, items: snapshot } : current));
         throw error;
       }
     },
-    [account, workspace],
+    [account, workspace, setSessionWorkspace],
   );
 
   const clearCompleted = useCallback(async () => {
-    if (!workspace || !account) throw new Error('登录状态过期了，请重新登录。');
+    if (!workspace || !account || activeUser.current !== account.userId) throw new Error('登录状态过期了，请重新登录。');
+    const request = sessionVersion.current;
     const snapshot = workspace.items;
-    setWorkspace((current) =>
+    setSessionWorkspace(request, (current) =>
       current ? { ...current, items: current.items.filter((item) => !item.done) } : current,
     );
     try {
       await backend.clearCompleted(workspace.household.id);
-      setWorkspace((current) => {
+      setSessionWorkspace(request, (current) => {
         if (!current) return current;
         writeCache(account.userId, current);
         return current;
       });
     } catch (error) {
-      setWorkspace((current) => (current ? { ...current, items: snapshot } : current));
+      setSessionWorkspace(request, (current) => (current ? { ...current, items: snapshot } : current));
       throw error;
     }
-  }, [account, workspace]);
+  }, [account, workspace, setSessionWorkspace]);
 
   const addPlace = useCallback(
     async (input: RoadtripPlaceInput) => {
-      if (!workspace || !account) throw new Error('登录状态过期了，请重新登录。');
+      if (!workspace || !account || activeUser.current !== account.userId) throw new Error('登录状态过期了，请重新登录。');
+      const request = sessionVersion.current;
       const prefecture = prefectureFor(input.prefectureCode);
       const now = new Date().toISOString();
       const tempId = makeTempId();
@@ -516,13 +564,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         pending: true,
       };
 
-      setWorkspace((current) =>
+      setSessionWorkspace(request, (current) =>
         current ? { ...current, places: [temp, ...current.places] } : current,
       );
 
       try {
         const real = await backend.addPlace(workspace.household.id, input);
-        setWorkspace((current) => {
+        setSessionWorkspace(request, (current) => {
           if (!current) return current;
           const next = {
             ...current,
@@ -533,7 +581,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         });
         return real;
       } catch (error) {
-        setWorkspace((current) =>
+        setSessionWorkspace(request, (current) =>
           current
             ? { ...current, places: current.places.filter((place) => place.id !== tempId) }
             : current,
@@ -541,12 +589,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         throw error;
       }
     },
-    [account, workspace],
+    [account, workspace, setSessionWorkspace],
   );
 
   const updatePlace = useCallback(
     async (id: string, input: RoadtripPlaceInput) => {
-      if (!workspace || !account) throw new Error('登录状态过期了，请重新登录。');
+      if (!workspace || !account || activeUser.current !== account.userId) throw new Error('登录状态过期了，请重新登录。');
+      const request = sessionVersion.current;
       const previous = workspace.places.find((place) => place.id === id);
       if (!previous) throw new Error('这个地方找不到了。');
       const prefecture = prefectureFor(input.prefectureCode);
@@ -575,7 +624,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         updatedAt: new Date().toISOString(),
       };
 
-      setWorkspace((current) =>
+      setSessionWorkspace(request, (current) =>
         current
           ? {
               ...current,
@@ -586,7 +635,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
       try {
         const real = await backend.updatePlace(id, input);
-        setWorkspace((current) => {
+        setSessionWorkspace(request, (current) => {
           if (!current) return current;
           const next = {
             ...current,
@@ -597,7 +646,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         });
         return real;
       } catch (error) {
-        setWorkspace((current) =>
+        setSessionWorkspace(request, (current) =>
           current
             ? {
                 ...current,
@@ -608,30 +657,32 @@ export function AppProvider({ children }: { children: ReactNode }) {
         throw error;
       }
     },
-    [account, workspace],
+    [account, workspace, setSessionWorkspace],
   );
 
   const deletePlace = useCallback(
     async (id: string) => {
-      if (!workspace || !account) throw new Error('登录状态过期了，请重新登录。');
+      if (!workspace || !account || activeUser.current !== account.userId) throw new Error('登录状态过期了，请重新登录。');
+      const request = sessionVersion.current;
       const snapshot = workspace.places;
-      setWorkspace((current) =>
+      setSessionWorkspace(request, (current) =>
         current ? { ...current, places: current.places.filter((place) => place.id !== id) } : current,
       );
       try {
         await backend.deletePlace(id);
-        setWorkspace((current) => {
+        setSessionWorkspace(request, (current) => {
           if (!current) return current;
           writeCache(account.userId, current);
           return current;
         });
       } catch (error) {
-        setWorkspace((current) => (current ? { ...current, places: snapshot } : current));
+        setSessionWorkspace(request, (current) => (current ? { ...current, places: snapshot } : current));
         throw error;
       }
     },
-    [account, workspace],
+    [account, workspace, setSessionWorkspace],
   );
+
 
   const retry = useCallback(async () => {
     if (account) {
@@ -644,7 +695,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const enterDemo = useCallback(
     async (identity: DemoIdentity) => {
       if (!backend.enterDemo) return;
+      const request = sessionVersion.current;
       const demoAccount = await backend.enterDemo(identity);
+      if (request !== sessionVersion.current) return;
       await loadAccountWorkspace(demoAccount, { allowCache: false });
     },
     [loadAccountWorkspace],
@@ -653,7 +706,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const switchDemoIdentity = useCallback(
     async (identity: DemoIdentity) => {
       if (!backend.switchDemoIdentity) return;
+      const request = sessionVersion.current;
       const demoAccount = await backend.switchDemoIdentity(identity);
+      if (request !== sessionVersion.current) return;
       await loadAccountWorkspace(demoAccount, { allowCache: false });
     },
     [loadAccountWorkspace],
@@ -661,8 +716,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const resetDemo = useCallback(async () => {
     if (!backend.resetDemo) return;
+    const request = sessionVersion.current;
     await backend.resetDemo();
     const demoAccount = await backend.restore();
+    if (request !== sessionVersion.current) return;
     if (demoAccount) await loadAccountWorkspace(demoAccount, { allowCache: false });
   }, [loadAccountWorkspace]);
 
