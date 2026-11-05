@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import homeArt from '../assets/little-home.svg';
+import roadArt from '../assets/road-postcard.svg';
+import bagArt from '../assets/market-bag.svg';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -18,55 +21,6 @@ import { LogoMark } from './Logo';
 import { SettingsSheet } from './SettingsSheet';
 import { countThisWeek, getGreeting } from '../lib/utils';
 import { formatShortDate, roadtripStats, sortPlaces } from '../roadtrip/helpers';
-
-function MapDoodle() {
-  return (
-    <svg
-      className="hub-map-doodle"
-      viewBox="0 0 300 220"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M16 182c31-6 45-34 48-63 4-42 40-47 68-65 31-20 61-18 94-2 21 11 36 30 56 38"
-        stroke="rgba(255, 248, 239, 0.2)"
-        strokeWidth="1.5"
-        strokeDasharray="5 7"
-        strokeLinecap="round"
-      />
-      <path
-        d="M34 44c11-8 22-9 32-3 9 5 8 17 1 24-9 9-24 7-31-2-5-6-5-14-2-19Z"
-        fill="rgba(255, 248, 239, 0.06)"
-      />
-      <circle cx="62" cy="136" r="5" fill="#f2a46b" />
-      <circle cx="154" cy="82" r="5" fill="#f2a46b" />
-      <circle cx="241" cy="114" r="5" fill="#f2a46b" />
-      <circle cx="62" cy="136" r="12" stroke="#f2a46b" strokeOpacity=".22" />
-      <circle cx="241" cy="114" r="12" stroke="#f2a46b" strokeOpacity=".22" />
-      <g transform="translate(137 47)">
-        <path
-          d="M0 25C0 12 8 2 19 2s19 10 19 23c0 13-19 27-19 27S0 38 0 25Z"
-          fill="#f4b58c"
-        />
-        <circle cx="19" cy="23" r="7" fill="#304338" />
-      </g>
-      <g transform="translate(224 80)">
-        <path
-          d="M0 20C0 9 6 1 15 1s15 8 15 19-15 21-15 21S0 31 0 20Z"
-          fill="#fff8ef"
-          fillOpacity=".9"
-        />
-        <circle cx="15" cy="18" r="5.5" fill="#3d5546" />
-      </g>
-      <text x="32" y="76" fill="rgba(255,248,239,.34)" fontSize="9" letterSpacing="2">
-        JAPAN
-      </text>
-      <text x="185" y="177" fill="rgba(255,248,239,.25)" fontSize="8" letterSpacing="2">
-        ROAD TRIP
-      </text>
-    </svg>
-  );
-}
 
 export function Hub() {
   const { workspace, account, demoMode, syncStatus, offline } = useApp();
@@ -124,15 +78,19 @@ export function Hub() {
 
       <main className="hub-main">
         <section className="hub-hero">
-          <span className="eyebrow eyebrow--accent">
-            <Sparkles size={13} />
-            {getGreeting()}，{workspace.me.displayName}
-          </span>
-          <h1>
-            今天，想去
-            <em>哪里？</em>
-          </h1>
-          <p>想去的先记在地图上，家里缺的顺手放进清单。两个人的日子，慢慢来。</p>
+          <div className="hub-hero__copy">
+            <span className="eyebrow eyebrow--accent">
+              <Sparkles size={13} />
+              {getGreeting()}，{workspace.me.displayName}
+            </span>
+            <h1>
+              把日常过好，
+              <br />
+              <em>也一起去远方。</em>
+            </h1>
+            <p>一张清单，装下生活的小事；一张地图，收藏两个人的远方。</p>
+          </div>
+          <img className="hub-hero__art" src={homeArt} alt="" aria-hidden="true" />
         </section>
 
         <section className="hub-grid" aria-label="选择要进入的小家空间">
@@ -143,12 +101,7 @@ export function Hub() {
               window.location.hash = '#/shopping';
             }}
           >
-            <div className="hub-shop-art" aria-hidden="true">
-              <span />
-              <span />
-              <span />
-              <ShoppingBag size={82} strokeWidth={1.2} />
-            </div>
+            <img className="hub-market-art" src={bagArt} alt="" aria-hidden="true" />
 
             <div className="hub-card__top">
               <span className="hub-card__label">
@@ -162,16 +115,16 @@ export function Hub() {
 
             <div className="hub-card__body">
               <h2>
-                家里缺什么，
+                把小日子，
                 <br />
-                <em>记一下就好。</em>
+                <em>一件件装满。</em>
               </h2>
               <p>
                 {pending.length > 0
                   ? `${pending.slice(0, 2).map((item) => item.name).join('、')}${pending.length > 2 ? '……' : ''} 还在等你们。`
                   : nextPlan
                     ? `清单空了。接下来可以去 ${nextPlan.name}。`
-                    : '清单空空的，今天可以轻松出门。'}
+                    : '想到要买什么，就来这里留一笔。'}
               </p>
             </div>
 
@@ -181,7 +134,7 @@ export function Hub() {
               ) : (
                 <span className="hub-shop-chips__empty">
                   <CheckCircle2 size={12} />
-                  都买齐了
+                  暂时没有待买
                 </span>
               )}
             </div>
@@ -214,7 +167,7 @@ export function Hub() {
               window.location.hash = '#/roadtrip';
             }}
           >
-            <MapDoodle />
+            <img className="hub-postcard-art" src={roadArt} alt="" aria-hidden="true" />
             <div className="hub-card__top">
               <span className="hub-card__label">
                 <Car size={15} />
@@ -227,14 +180,14 @@ export function Hub() {
 
             <div className="hub-card__body">
               <h2>
-                把去过的日本，
+                下一站，
                 <br />
-                <em>再添一个图钉。</em>
+                <em>一起出发。</em>
               </h2>
               <p>
                 {latest
                   ? `最近一次是 ${latest.name}，${formatShortDate(latest.visitedOn)}。`
-                  : '第一枚图钉，等你们一起钉上去。'}
+                  : '从想去的地方开始，慢慢画出你们的路线。'}
               </p>
             </div>
 
@@ -262,12 +215,12 @@ export function Hub() {
 
         <footer className="hub-footer">
           <span>
-            <ShoppingBag size={14} />
-            {pending.length > 0 ? `还有 ${pending.length} 件待买` : '清单已经清空'}
-          </span>
-          <span>
             <MapPinned size={14} />
             {latest ? `上一站：${latest.prefectureName} · ${latest.name}` : '下一站，等你们决定'}
+          </span>
+          <span>
+            <ShoppingBag size={14} />
+            {pending.length > 0 ? `还有 ${pending.length} 件待买` : '日常小事，一起惦记'}
           </span>
         </footer>
       </main>

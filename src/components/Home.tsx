@@ -260,9 +260,9 @@ export function Home() {
             <span className="eyebrow">
               {getGreeting()}，{workspace.me.displayName}
             </span>
-            <h1>家里还缺什么？</h1>
+            <h1>把日常，装进清单。</h1>
           </div>
-          <p>记在这里，下次一起出门就不会忘。</p>
+          <p>洗发水、晚餐的食材，或是忽然想到的小东西。</p>
         </section>
 
         <section className="overview">
@@ -274,8 +274,8 @@ export function Home() {
             </div>
             <p>
               {pending.length === 0
-                ? '清单清空啦，今天可以轻松出门。'
-                : '出门前看一眼，回来就都齐了。'}
+                ? '暂时没有待买，想到什么再添一笔。'
+                : '出门前看一眼，少一点来回惦记。'}
             </p>
           </div>
 

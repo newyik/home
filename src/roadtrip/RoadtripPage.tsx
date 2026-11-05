@@ -1,3 +1,4 @@
+import roadArt from '../assets/road-postcard.svg';
 import { useMemo, useState } from 'react';
 import {
   ArrowLeft,
@@ -170,12 +171,13 @@ export function RoadtripPage({ onBack }: { onBack: () => void }) {
               两个人的日本自驾地图
             </span>
             <h1>
-              把去过的地方，
+              收藏沿途风景，
               <br />
-              <em>钉在日本地图上。</em>
+              <em>慢慢走遍日本。</em>
             </h1>
-            <p>去过的地方变成图钉，想去的先插一面小旗。下一次出发，从这里开始。</p>
+            <p>海边、公路和偶遇的小城。去过的留个纪念，想去的约好下一次。</p>
           </div>
+          <img className="rt-hero__art" src={roadArt} alt="" aria-hidden="true" />
           <div className="rt-hero__stamp" aria-hidden="true">
             <Compass size={20} />
             <strong>日本</strong>
@@ -371,11 +373,11 @@ export function RoadtripPage({ onBack }: { onBack: () => void }) {
                   <span className="rt-empty__icon">
                     <MapPinned size={26} />
                   </span>
-                  <h3>{hasFilters ? '没有找到这个地方' : '地图还是空的'}</h3>
+                  <h3>{hasFilters ? '没有找到这个地方' : '第一站，留给你们'}</h3>
                   <p>
                     {hasFilters
                       ? '换个关键词，或者看看全日本。'
-                      : '把第一次自驾去过的地方钉上去吧。'}
+                      : '从一个想去或去过的地方开始，收藏你们的旅程。'}
                   </p>
                   <button
                     type="button"

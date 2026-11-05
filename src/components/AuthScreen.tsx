@@ -15,6 +15,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { Avatar } from './Avatar';
 import { Logo } from './Logo';
+import homeArt from '../assets/little-home.svg';
 
 type Mode = 'login' | 'signup' | 'reset';
 
@@ -35,9 +36,9 @@ export function AuthScreen() {
   const [notice, setNotice] = useState<string | null>(null);
 
   const heading = useMemo(() => {
-    if (mode === 'signup') return '创建你们的账号';
+    if (mode === 'signup') return '先认识一下你';
     if (mode === 'reset') return '找回密码';
-    return '欢迎回来';
+    return '欢迎回家';
   }, [mode]);
 
   const switchMode = (next: Mode) => {
@@ -108,14 +109,15 @@ export function AuthScreen() {
         <div className="auth__hero-copy">
           <span className="eyebrow eyebrow--accent">
             <Sparkles size={13} />
-            为两个人做的清单
+            两个人的生活手记
           </span>
           <h1>
-            家里缺什么，
+            日常有你，
             <br />
-            <em>一起记下来。</em>
+            <em>远方也有你。</em>
           </h1>
-          <p>不用再问「买了吗」。打开就知道，出门前看一眼，刚刚好。</p>
+          <p>把要买的记在一起，把想去的留在地图上。生活里的小事，有人和你一起惦记。</p>
+          <img className="auth-home-art" src={homeArt} alt="" aria-hidden="true" />
         </div>
 
         <div className="auth-preview" aria-hidden="true">
@@ -155,7 +157,7 @@ export function AuthScreen() {
 
         <div className="auth__features">
           <span>
-            <Check size={14} /> 两台 iPhone
+            <Check size={14} /> 手机和电脑
           </span>
           <span>
             <Check size={14} /> 实时同步
@@ -239,7 +241,7 @@ export function AuthScreen() {
                     ? '先给自己建个账号，下一步再创建或加入小家。'
                     : mode === 'reset'
                       ? '输入注册邮箱，我们给你发一封重置链接。'
-                      : '登录后就能看到你们共同维护的采购清单。'}
+                      : '登录后，接着记录你们的清单和旅行。'}
                 </p>
               </div>
 
@@ -367,7 +369,7 @@ export function AuthScreen() {
 
               <p className="privacy-note">
                 <LockKeyhole size={13} />
-                登录信息只用来同步你们两个人的清单。
+                用自己的账号登录，在小家里共享清单和地图。
               </p>
             </>
           )}
@@ -375,7 +377,7 @@ export function AuthScreen() {
 
         <p className="auth__footer">
           <span className="auth__footer-dot" />
-          只属于你们两个人的小清单
+          一起买，也一起去。
         </p>
       </section>
     </main>
