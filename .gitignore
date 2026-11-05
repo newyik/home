@@ -1,0 +1,16 @@
+node_modules
+dist
+dist-ssr
+.env
+.env.local
+.env.*.local
+*.local
+.DS_Store
+coverage
+.vite
+playwright-report
+test-results
+.npm-cache
+
+# 本地预览用的二维码，IP 地址会变，不提交
+docs/local-preview-qr.png

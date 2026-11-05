@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="一起买">
+  <defs>
+    <linearGradient id="bg" x1="120" y1="80" x2="900" y2="960" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ea6a45"/>
+      <stop offset="1" stop-color="#cf4826"/>
+    </linearGradient>
+    <linearGradient id="bag" x1="500" y1="360" x2="520" y2="830" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fffaf2"/>
+      <stop offset="1" stop-color="#f8ecd9"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="228" fill="url(#bg)"/>
+  <circle cx="812" cy="220" r="66" fill="#f7b26a" opacity=".34"/>
+  <circle cx="198" cy="760" r="104" fill="#a9341b" opacity=".18"/>
+  <path d="M392 392V332c0-68 54-122 120-122s120 54 120 122v60" fill="none" stroke="#fff8ef" stroke-width="48" stroke-linecap="round"/>
+  <path d="M301 392h422c15 0 27 12 28 27l31 382c1 18-13 33-31 33H273c-18 0-32-15-31-33l31-382c1-15 13-27 28-27Z" fill="url(#bag)"/>
+  <path d="M512 704c-8 0-15-3-21-8-45-37-99-81-99-135 0-39 30-70 68-70 21 0 40 10 52 27 12-17 31-27 52-27 38 0 68 31 68 70 0 54-54 98-99 135-6 5-13 8-21 8Z" fill="#dc5631"/>
+  <path d="M770 344l8 19 19 8-19 8-8 19-8-19-19-8 19-8 8-19Z" fill="#ffd9a1"/>
+  <path d="M242 292l5 12 12 5-12 5-5 12-5-12-12-5 12-5 5-12Z" fill="#ffd9a1" opacity=".9"/>
+</svg>
