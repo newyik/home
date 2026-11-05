@@ -7,6 +7,7 @@ import {
   LoaderCircle,
   MapPinned,
   LockKeyhole,
+  KeyRound,
   Mail,
   ShoppingBag,
   Sparkles,
@@ -16,6 +17,7 @@ import { useApp } from '../context/AppContext';
 import { Avatar } from './Avatar';
 import { Logo } from './Logo';
 import homeArt from '../assets/little-home.svg';
+import { normalizeInviteCode } from '../lib/utils';
 
 type Mode = 'login' | 'signup' | 'reset';
 
@@ -23,9 +25,12 @@ function isEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 }
 
-export function AuthScreen() {
+export function AuthScreen({ inviteCode, onInviteCodeChange }: {
+  inviteCode: string;
+  onInviteCodeChange: (code: string) => void;
+}) {
   const { demoMode, enterDemo, signIn, signUp, resetPassword } = useApp();
-  const [mode, setMode] = useState<Mode>('login');
+  const [mode, setMode] = useState<Mode>(inviteCode ? 'signup' : 'login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -52,6 +57,10 @@ export function AuthScreen() {
     setError(null);
     setNotice(null);
 
+    if (mode !== 'reset' && inviteCode && inviteCode.length !== 6) {
+      setError('邀请码需要 6 位字母或数字，暂时不加入也可以先留空。');
+      return;
+    }
     if (!isEmail(email)) {
       setError('先填一个正确的邮箱地址。');
       return;
@@ -238,10 +247,10 @@ export function AuthScreen() {
                 <h2>{heading}</h2>
                 <p className="auth-card__lead">
                   {mode === 'signup'
-                    ? '先给自己建个账号，下一步再创建或加入小家。'
+                    ? '用自己的邮箱注册。有 TA 的邀请码，可以在下方填写。'
                     : mode === 'reset'
                       ? '输入注册邮箱，我们给你发一封重置链接。'
-                      : '登录后，接着记录你们的清单和旅行。'}
+                      : '用自己的邮箱登录。有邀请码，就能继续加入 TA 的小家。'}
                 </p>
               </div>
 
@@ -324,6 +333,20 @@ export function AuthScreen() {
                         {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                       </button>
                     </span>
+                  </label>
+                ) : null}
+
+                {mode !== 'reset' ? (
+                  <label className="field invite-entry">
+                    <span className="field__label">加入 TA 的小家 · 邀请码（可选）</span>
+                    <span className="field__control">
+                      <KeyRound size={18} />
+                      <input type="text" value={inviteCode}
+                        onChange={event => onInviteCodeChange(normalizeInviteCode(event.target.value))}
+                        placeholder="输入 TA 发来的 6 位邀请码"
+                        maxLength={8} autoCapitalize="characters" autoComplete="off" spellCheck={false} />
+                    </span>
+                    <small>填写后，注册或登录成功会进入「加入小家」；留空则可以创建自己的小家。</small>
                   </label>
                 ) : null}
 

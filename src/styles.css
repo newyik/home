@@ -5655,3 +5655,7 @@ body {
   .hub-topbar { padding-bottom: 10px; }
   .hub-main { padding-top: 12px; gap: 13px; }
 }
+.invite-entry { padding: 13px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-2); }
+.invite-entry small { color: var(--ink-soft); font-size: 11px; line-height: 1.6; }
+.invite-entry input { letter-spacing: .08em; }
+.invite-link-button { margin: 12px 0; }

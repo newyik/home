@@ -234,6 +234,12 @@ export function appUrl(): string {
   return new URL(import.meta.env.BASE_URL, window.location.origin).href;
 }
 
+export function invitationUrl(code: string): string {
+  const url = new URL(appUrl());
+  url.searchParams.set('join', normalizeInviteCode(code));
+  return url.href;
+}
+
 export function shortcutAddUrl(sample = '牛奶'): string {
   return `${appUrl()}?add=${encodeURIComponent(sample)}&quick=1#/shopping`;
 }

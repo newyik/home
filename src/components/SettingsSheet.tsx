@@ -19,7 +19,7 @@ import { AvatarPicker } from './AvatarPicker';
 import { Sheet } from './Sheet';
 import { ShortcutGuide } from './ShortcutGuide';
 import {
-  appUrl,
+  invitationUrl,
   copyText,
   cx,
   formatInviteCode,
@@ -75,18 +75,27 @@ export function SettingsSheet({ open, onClose }: { open: boolean; onClose: () =>
     }
   };
 
+  const copyInviteLink = async () => {
+    try {
+      await copyText(invitationUrl(workspace.household.inviteCode));
+      showToast('邀请链接已复制。TA 打开后注册或登录，就能继续加入。', { tone: 'success' });
+    } catch {
+      showToast('复制失败，可以复制上方邀请码发给 TA。', { tone: 'error' });
+    }
+  };
+
   const shareInvite = async () => {
     const text = `来加入「${workspace.household.name}」的采购清单吧。邀请码：${workspace.household.inviteCode}`;
     if (navigator.share) {
       try {
-        await navigator.share({ title: '一起买', text, url: appUrl() });
+        await navigator.share({ title: '一起买', text, url: invitationUrl(workspace.household.inviteCode) });
         return;
       } catch {
         return;
       }
     }
     try {
-      await copyText(`${text}\n${appUrl()}`);
+      await copyText(`${text}\n${invitationUrl(workspace.household.inviteCode)}`);
       showToast('邀请信息已复制。', { tone: 'success' });
     } catch {
       showToast('分享失败，手动复制邀请码吧。', { tone: 'error' });
@@ -257,7 +266,7 @@ export function SettingsSheet({ open, onClose }: { open: boolean; onClose: () =>
               <div>
                 <span className="invite-card__label">邀请码</span>
                 <strong className="invite-code">{inviteCode}</strong>
-                <small>TA 注册后输入这个码，就能看到同一份清单。</small>
+                <small>TA 用自己的邮箱注册或登录，再输入这个码加入。</small>
               </div>
               <div className="invite-card__actions">
                 <button type="button" className="icon-button icon-button--soft" onClick={() => void copyCode()} aria-label="复制邀请码">
@@ -269,6 +278,10 @@ export function SettingsSheet({ open, onClose }: { open: boolean; onClose: () =>
               </div>
             </div>
 
+            <button type="button" className="button button--soft button--small invite-link-button"
+              onClick={() => void copyInviteLink()}>
+              <Copy size={14} />复制邀请链接
+            </button>
             <div className="member-list">
               {workspace.members.map((member) => (
                 <div className="member-row" key={member.id}>

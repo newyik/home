@@ -9,6 +9,7 @@ import { LogoMark } from './components/Logo';
 import { Onboarding } from './components/Onboarding';
 import { RecoveryScreen } from './components/RecoveryScreen';
 import { parseDeepLink } from './lib/utils';
+import { readPendingInvite, savePendingInvite } from './lib/invite';
 
 const RoadtripPage = lazy(() =>
   import('./roadtrip/RoadtripPage').then((module) => ({ default: module.RoadtripPage })),
@@ -67,7 +68,7 @@ function Shell() {
   const { phase, demoMode, enterDemo, recovery } = useApp();
   const [initialLink] = useState(() => parseDeepLink(window.location.search));
   const [hash, setHash] = useState(() => window.location.hash);
-  const joinCode = initialLink.join ?? '';
+  const [joinCode, setJoinCode] = useState(() => initialLink.join ?? readPendingInvite());
   const demoStarted = useRef(false);
 
   useEffect(() => {
@@ -113,9 +114,18 @@ function Shell() {
     }
   }, [demoMode, enterDemo, initialLink.demo, phase]);
 
+  useEffect(() => {
+    if (phase === 'ready') {
+      savePendingInvite('');
+      setJoinCode('');
+    } else {
+      savePendingInvite(joinCode);
+    }
+  }, [joinCode, phase]);
+
   if (phase === 'loading') return <Splash />;
   if (phase === 'error') return <ErrorScreen />;
-  if (phase === 'signedOut') return <AuthScreen />;
+  if (phase === 'signedOut') return <AuthScreen inviteCode={joinCode} onInviteCodeChange={setJoinCode} />;
   if (phase === 'onboarding') return <Onboarding initialCode={joinCode} />;
   if (recovery) return <RecoveryScreen />;
 
