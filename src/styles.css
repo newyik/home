@@ -4825,19 +4825,19 @@ p {
   z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 22px;
-  padding-top: 38px;
+  gap: 18px;
+  padding-top: 24px;
 }
 
 .hub-hero {
-  max-width: 740px;
+  max-width: 700px;
   padding: 0 4px;
   animation: fadeUp 0.45s ease both;
 }
 
 .hub-hero h1 {
-  margin: 12px 0 14px;
-  font-size: clamp(2.65rem, 5vw, 4.15rem);
+  margin: 9px 0 10px;
+  font-size: clamp(2.05rem, 3.2vw, 2.8rem);
   font-weight: 800;
   letter-spacing: -0.055em;
   line-height: 1.08;
@@ -4857,17 +4857,20 @@ p {
 
 .hub-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.04fr) minmax(0, 0.96fr);
-  gap: 17px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 13px;
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
 }
 
 .hub-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  min-height: 374px;
+  min-height: 285px;
   overflow: hidden;
-  padding: 24px 25px 21px;
+  padding: 21px 23px 18px;
   border: 1px solid transparent;
   border-radius: 29px;
   text-align: left;
@@ -4976,13 +4979,13 @@ p {
 .hub-card__body {
   position: relative;
   z-index: 2;
-  max-width: 360px;
-  margin-top: 29px;
+  max-width: 400px;
+  margin-top: 20px;
 }
 
 .hub-card__body h2 {
-  margin: 0 0 10px;
-  font-size: clamp(1.55rem, 2.4vw, 2.05rem);
+  margin: 0 0 8px;
+  font-size: clamp(1.5rem, 2.2vw, 1.9rem);
   font-weight: 800;
   letter-spacing: -0.045em;
   line-height: 1.22;
@@ -5018,7 +5021,7 @@ p {
   display: flex;
   gap: 18px;
   margin-top: auto;
-  padding-top: 27px;
+  padding-top: 18px;
 }
 
 .hub-card__stats span {
@@ -5058,7 +5061,7 @@ p {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  margin-top: 18px;
+  margin-top: 12px;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -5121,7 +5124,7 @@ p {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
-  margin-top: 15px;
+  margin-top: 10px;
 }
 
 .hub-shop-chips span {
@@ -5147,7 +5150,10 @@ p {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 4px 5px 0;
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 2px 5px 0;
   color: #ab9c8d;
   font-size: 9px;
 }
@@ -5164,12 +5170,12 @@ p {
   }
 
   .hub-main {
-    padding-top: 29px;
-    gap: 17px;
+    padding-top: 20px;
+    gap: 14px;
   }
 
   .hub-hero h1 {
-    font-size: clamp(2.15rem, 7vw, 3rem);
+    font-size: clamp(1.95rem, 6vw, 2.55rem);
   }
 
   .hub-grid {
@@ -5178,8 +5184,8 @@ p {
   }
 
   .hub-card {
-    min-height: 300px;
-    padding: 20px 20px 18px;
+    min-height: 270px;
+    padding: 18px 19px 17px;
     border-radius: 23px;
   }
 
@@ -5264,8 +5270,8 @@ p {
   }
 
   .hub-hero h1 {
-    margin: 9px 0 10px;
-    font-size: clamp(2rem, 10vw, 2.6rem);
+    margin: 8px 0 8px;
+    font-size: clamp(1.8rem, 8.5vw, 2.25rem);
   }
 
   .hub-hero p {
@@ -5273,8 +5279,8 @@ p {
   }
 
   .hub-card {
-    min-height: 280px;
-    padding: 18px 17px 16px;
+    min-height: 255px;
+    padding: 16px 16px 15px;
     border-radius: 21px;
   }
 
@@ -5334,8 +5340,8 @@ p {
 @media (min-width: 901px) {
   .hub-main {
     min-height: calc(100dvh - 92px);
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 14px;
+    padding-bottom: 14px;
     justify-content: center;
   }
 }

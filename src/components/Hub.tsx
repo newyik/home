@@ -138,58 +138,6 @@ export function Hub() {
         <section className="hub-grid" aria-label="选择要进入的小家空间">
           <button
             type="button"
-            className="hub-card hub-card--trip"
-            onClick={() => {
-              window.location.hash = '#/roadtrip';
-            }}
-          >
-            <MapDoodle />
-            <div className="hub-card__top">
-              <span className="hub-card__label">
-                <Car size={15} />
-                自驾打卡
-              </span>
-              <span className="hub-card__arrow">
-                <ArrowUpRight size={18} />
-              </span>
-            </div>
-
-            <div className="hub-card__body">
-              <h2>
-                把去过的日本，
-                <br />
-                <em>再添一个图钉。</em>
-              </h2>
-              <p>
-                {latest
-                  ? `最近一次是 ${latest.name}，${formatShortDate(latest.visitedOn)}。`
-                  : '第一枚图钉，等你们一起钉上去。'}
-              </p>
-            </div>
-
-            <div className="hub-card__stats">
-              <span>
-                <strong>{stats.visited}</strong>
-                去过
-              </span>
-              <span>
-                <strong>{stats.planned}</strong>
-                计划
-              </span>
-              <span>
-                <strong>{stats.prefectureCount}</strong>
-                都道府县
-              </span>
-            </div>
-
-            <span className="hub-card__cta">
-              打开日本地图
-              <ArrowRight size={15} />
-            </span>
-          </button>
-
-          <button
-            type="button"
             className="hub-card hub-card--shop"
             onClick={() => {
               window.location.hash = '#/shopping';
@@ -258,16 +206,68 @@ export function Hub() {
               <ArrowRight size={15} />
             </span>
           </button>
+
+          <button
+            type="button"
+            className="hub-card hub-card--trip"
+            onClick={() => {
+              window.location.hash = '#/roadtrip';
+            }}
+          >
+            <MapDoodle />
+            <div className="hub-card__top">
+              <span className="hub-card__label">
+                <Car size={15} />
+                自驾打卡
+              </span>
+              <span className="hub-card__arrow">
+                <ArrowUpRight size={18} />
+              </span>
+            </div>
+
+            <div className="hub-card__body">
+              <h2>
+                把去过的日本，
+                <br />
+                <em>再添一个图钉。</em>
+              </h2>
+              <p>
+                {latest
+                  ? `最近一次是 ${latest.name}，${formatShortDate(latest.visitedOn)}。`
+                  : '第一枚图钉，等你们一起钉上去。'}
+              </p>
+            </div>
+
+            <div className="hub-card__stats">
+              <span>
+                <strong>{stats.visited}</strong>
+                去过
+              </span>
+              <span>
+                <strong>{stats.planned}</strong>
+                计划
+              </span>
+              <span>
+                <strong>{stats.prefectureCount}</strong>
+                都道府县
+              </span>
+            </div>
+
+            <span className="hub-card__cta">
+              打开日本地图
+              <ArrowRight size={15} />
+            </span>
+          </button>
         </section>
 
         <footer className="hub-footer">
           <span>
-            <MapPinned size={14} />
-            {latest ? `上一站：${latest.prefectureName} · ${latest.name}` : '下一站，等你们决定'}
-          </span>
-          <span>
             <ShoppingBag size={14} />
             {pending.length > 0 ? `还有 ${pending.length} 件待买` : '清单已经清空'}
+          </span>
+          <span>
+            <MapPinned size={14} />
+            {latest ? `上一站：${latest.prefectureName} · ${latest.name}` : '下一站，等你们决定'}
           </span>
         </footer>
       </main>
