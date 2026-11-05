@@ -99,7 +99,11 @@ const ROWS: Row[] = [
   ['miyajima', '宫岛', '宮島', '34', 34.2960, 132.3200, 'shrine'],
   ['hiroshima', '广岛和平公园', '広島平和公園', '34', 34.3950, 132.4530, 'shrine'],
   ['onomichi', '尾道', '尾道', '34', 34.4080, 133.2000, 'city'],
+  ['tsunoshima-island', '角岛', '角島', '35', 34.3574, 130.8698, 'nature'],
   ['tsunoshima', '角岛大桥', '角島大橋', '35', 34.3500, 130.9000, 'nature'],
+  ['motono', '元乃隅神社', '元乃隅神社', '35', 34.4201, 131.0632, 'shrine'],
+  ['hagi', '萩', '萩', '35', 34.4080, 131.3990, 'city'],
+  ['akiyoshidai', '秋吉台', '秋吉台', '35', 34.2400, 131.3000, 'nature'],
   ['akiyoshido', '秋芳洞', '秋芳洞', '35', 34.2300, 131.3000, 'nature'],
   ['otsuka', '大冢国际美术馆', '大塚国際美術館', '36', 34.0800, 134.5600, 'park'],
   ['naruto', '鸣门漩涡', '鳴門の渦潮', '36', 34.2400, 134.6500, 'nature'],
@@ -132,11 +136,28 @@ const ROWS: Row[] = [
   ['miyako', '宫古岛', '宮古島', '47', 24.8000, 125.2800, 'nature'],
 ];
 
+const SPOT_ALIASES: Record<string, string[]> = {
+  tsunoshima: ['角岛', '角島', '角岛大桥', '角島大橋', 'Tsunoshima', 'Tsunoshima Bridge'],
+  'tsunoshima-island': ['角岛', '角島', 'Tsunoshima Island'],
+  motono: ['元乃隅', '元乃隅稻成神社', '元乃隅稲成神社', 'Motonosumi'],
+  fuji: ['富士', 'Mount Fuji', 'Fuji'],
+  hakone: ['Hakone'],
+  kawaguchiko: ['河口湖', 'Kawaguchiko'],
+  kyoto: ['京都', 'Kyoto'],
+  nara: ['奈良', 'Nara'],
+  kanazawa: ['金沢', 'Kanazawa'],
+  shirakawago: ['白川郷', 'Shirakawa-go'],
+};
+
 export const JAPAN_SPOTS: JapanSpot[] = ROWS.map(([id, name, nameJa, prefectureCode, lat, lng, category]) => ({
   id,
   name,
   nameJa,
-  aliases: [prefectureFor(prefectureCode).name, prefectureFor(prefectureCode).nameJa],
+  aliases: [
+    ...(SPOT_ALIASES[id] ?? []),
+    prefectureFor(prefectureCode).name,
+    prefectureFor(prefectureCode).nameJa,
+  ],
   prefectureCode,
   lat,
   lng,

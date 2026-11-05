@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from 'react';
 import {
   Check,
   LoaderCircle,
@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { PREFECTURES, nearestPrefecture, prefectureFor } from './prefectures';
 import { searchJapanSpots, spotById } from './spots';
+import { searchOnlinePlaces, type OnlinePlace } from './onlineSearch';
 import { todayISO } from './dates';
 import {
   ROADTRIP_CATEGORIES,
@@ -59,6 +60,10 @@ export function PlaceSheet({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [onlineStatus, setOnlineStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
+  const [onlineResults, setOnlineResults] = useState<OnlinePlace[]>([]);
+  const [onlineError, setOnlineError] = useState<string | null>(null);
+  const onlineAbort = useRef<AbortController | null>(null);
 
   const editing = Boolean(place);
   const results = useMemo(() => searchJapanSpots(query), [query]);
@@ -105,10 +110,18 @@ export function PlaceSheet({
     }
 
     setQuery('');
+    setOnlineStatus('idle');
+    setOnlineResults([]);
+    setOnlineError(null);
+    onlineAbort.current?.abort();
     setBusy(false);
     setError(null);
     setConfirmDelete(false);
   }, [open, place?.id, initialPoint, initialName]);
+
+  useEffect(() => {
+    return () => onlineAbort.current?.abort();
+  }, []);
 
   const chooseSpot = (spotId: string) => {
     const spot = spotById(spotId);
@@ -121,6 +134,47 @@ export function PlaceSheet({
     setPointExact(true);
     setCategory(spot.category);
     setQuery('');
+    setOnlineStatus('idle');
+    setOnlineResults([]);
+    setOnlineError(null);
+  };
+
+  const runOnlineSearch = async () => {
+    const clean = query.trim();
+    if (clean.length < 2 || onlineStatus === 'loading') return;
+
+    onlineAbort.current?.abort();
+    const controller = new AbortController();
+    onlineAbort.current = controller;
+    setOnlineStatus('loading');
+    setOnlineError(null);
+
+    try {
+      const found = await searchOnlinePlaces(clean, controller.signal);
+      if (controller.signal.aborted) return;
+      setOnlineResults(found);
+      setOnlineStatus('done');
+    } catch (caught) {
+      if (controller.signal.aborted) return;
+      setOnlineError(
+        caught instanceof Error ? caught.message : '在线搜索暂时不可用，可以在地图上选点。',
+      );
+      setOnlineStatus('error');
+    }
+  };
+
+  const chooseOnlinePlace = (online: OnlinePlace) => {
+    setName(online.name);
+    setNameJa(online.name);
+    setPrefectureCode(online.prefectureCode);
+    setLat(online.lat);
+    setLng(online.lng);
+    setPointExact(true);
+    setCategory(online.category);
+    setQuery('');
+    setOnlineStatus('idle');
+    setOnlineResults([]);
+    setOnlineError(null);
   };
 
   const choosePrefecture = (code: string) => {
@@ -228,7 +282,13 @@ export function PlaceSheet({
               id="rt-spot-search"
               type="search"
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setOnlineStatus('idle');
+                setOnlineResults([]);
+                setOnlineError(null);
+                onlineAbort.current?.abort();
+              }}
               placeholder="箱根、白川乡、金泽……"
               autoComplete="off"
             />
@@ -256,9 +316,58 @@ export function PlaceSheet({
                 ))
               ) : (
                 <div className="rt-search-empty">
-                  没找到这个地点。可以直接在地图上选个位置。
+                  常用地点库里没有，试试下面的在线搜索。
                 </div>
               )}
+
+              <div className="rt-online-search">
+                <button
+                  type="button"
+                  className="rt-online-search__button"
+                  onClick={() => void runOnlineSearch()}
+                  disabled={onlineStatus === 'loading'}
+                >
+                  {onlineStatus === 'loading' ? (
+                    <LoaderCircle size={15} className="spin" />
+                  ) : (
+                    <Search size={15} />
+                  )}
+                  {onlineStatus === 'loading'
+                    ? '正在搜索日本地址…'
+                    : `在日本地图上搜索「${query.trim()}」`}
+                </button>
+
+                {onlineStatus === 'done' && onlineResults.length === 0 ? (
+                  <div className="rt-search-empty">
+                    OpenStreetMap 也没找到。可以直接在地图上点选位置。
+                  </div>
+                ) : null}
+
+                {onlineResults.map((online) => (
+                  <button
+                    key={online.id}
+                    type="button"
+                    className="rt-search-result rt-search-result--online"
+                    onClick={() => chooseOnlinePlace(online)}
+                  >
+                    <span className="rt-search-result__icon">
+                      <RoadtripCategoryIcon category={online.category} size={15} />
+                    </span>
+                    <span>
+                      <strong>{online.name}</strong>
+                      <small>{online.displayName}</small>
+                    </span>
+                    <span className="rt-search-source">在线</span>
+                  </button>
+                ))}
+
+                {onlineError ? <div className="rt-search-empty">{onlineError}</div> : null}
+                {onlineStatus !== 'idle' ? (
+                  <small className="rt-online-search__credit">
+                    在线结果来自 OpenStreetMap，地址可能不精确，保存前请确认都道府县和地图位置。
+                  </small>
+                ) : null}
+              </div>
             </div>
           ) : null}
         </div>

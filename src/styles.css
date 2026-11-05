@@ -5391,3 +5391,65 @@ p {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.rt-online-search {
+  display: grid;
+  gap: 6px;
+  margin-top: 7px;
+  padding-top: 8px;
+  border-top: 1px dashed #e7dbce;
+}
+
+.rt-online-search__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 9px;
+  border: 1px dashed #ddc9b7;
+  border-radius: 8px;
+  color: #a16c4d;
+  background: #fffaf4;
+  font-size: 9.5px;
+  font-weight: 650;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.rt-online-search__button:hover:not(:disabled) {
+  border-color: #d7b69c;
+  color: var(--accent-deep);
+  background: var(--accent-soft);
+}
+
+.rt-search-result--online {
+  border-top: 1px dashed #eee2d5;
+  border-bottom: 0;
+}
+
+.rt-search-result--online small {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.rt-search-source {
+  margin-left: auto;
+  padding: 2px 5px;
+  flex: none;
+  border-radius: 4px;
+  color: #8b705b;
+  background: #f4e9dc;
+  font-size: 8px;
+}
+
+.rt-online-search__credit {
+  display: block;
+  padding: 0 2px;
+  color: #aa9b8c;
+  font-size: 8px;
+  line-height: 1.5;
+}
