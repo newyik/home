@@ -357,7 +357,7 @@ class SupabaseBackend implements Backend {
 
   async signOut(): Promise<void> {
     this.authGeneration++;
-    const { error } = await this.client.auth.signOut();
+    const { error } = await this.client.auth.signOut({ scope: 'local' });
     if (error) throw new Error(error.message);
     clearCachedAccount();
   }
