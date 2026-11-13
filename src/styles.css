@@ -5670,3 +5670,88 @@ body {
   font-size: 8px;
   font-weight: 700;
 }
+
+/* ── 动效补充层（只加样式，不改结构与数据） ───────────────────────
+   用 translate / scale / rotate 独立属性做位移，不覆盖原有的 transform。 */
+:root { --ease-out: cubic-bezier(0.22, 0.8, 0.26, 1); --spring: cubic-bezier(0.3, 1.35, 0.5, 1); }
+h1, h2 { text-wrap: balance; }
+
+@keyframes riseIn { from { opacity: 0; translate: 0 16px; } }
+@keyframes popIn { from { opacity: 0; scale: 0.84; } }
+@keyframes dropIn { from { opacity: 0; translate: 0 -100%; } }
+@keyframes inkIn { from { opacity: 0; filter: blur(8px); translate: 0 6px; } }
+@keyframes bob { 0%, 100% { translate: 0 0; rotate: 0deg; } 50% { translate: 0 -7px; rotate: 1.2deg; } }
+@keyframes glowDrift { to { translate: 4% -3%; scale: 1.1; } }
+@keyframes stampIn { 0% { opacity: 0; scale: 1.7; rotate: -18deg; } 60% { opacity: 1; scale: 0.94; } 100% { scale: 1; } }
+@keyframes twinkle { 0%, 100% { opacity: 0.35; scale: 0.8; } 50% { opacity: 1; scale: 1.15; } }
+@keyframes ringOut { 0% { scale: 1; opacity: 0.5; } 100% { scale: 1.6; opacity: 0; } }
+@keyframes turnIn { from { opacity: 0; rotate: -120deg; scale: 0.8; } }
+
+/* 背景光晕缓慢漂移 */
+.hub__glow, .app__glow, .rt-page__glow { animation: glowDrift 28s ease-in-out infinite alternate; }
+.hub__glow--two, .app__glow--two, .rt-page__glow--two { animation-duration: 36s; animation-direction: alternate-reverse; }
+
+/* 顶栏滑入，头像依次弹出 */
+.hub-topbar, .topbar, .rt-topbar { animation: dropIn 0.55s var(--ease-out) backwards; }
+.member-stack__item, .avatar-button { animation: popIn 0.5s 0.3s var(--spring) backwards; }
+.member-stack__item:nth-child(2) { animation-delay: 0.38s; }
+.avatar-button { animation-delay: 0.46s; }
+
+/* 首页：两张卡片依次浮现，插画轻轻浮动 */
+.hub-grid > * { animation: riseIn 0.65s 0.12s var(--ease-out) backwards; }
+.hub-grid > :nth-child(2) { animation-delay: 0.24s; }
+.hub-card { transition: translate 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out), border-color 0.3s; }
+.hub-market-art, .hub-postcard-art, .hub-hero__art, .rt-hero__art { animation: bob 7s ease-in-out infinite; }
+.hub-postcard-art { animation-duration: 8.5s; animation-delay: -3s; }
+.hub-card__arrow { transition: translate 0.35s var(--spring), background-color 0.25s; }
+.hub-card__cta svg { transition: translate 0.3s var(--ease-out); }
+.hub-card__stats strong, .overview__number, .rt-stat strong { animation: inkIn 0.8s 0.4s var(--ease-out) backwards; }
+.hub-shop-chips > * { animation: popIn 0.45s 0.45s var(--spring) backwards; }
+.hub-footer, .app__footer { animation: riseIn 0.6s 0.5s var(--ease-out) backwards; }
+
+/* 一起买：各区块依次浮现 */
+.app__main > * { animation: riseIn 0.55s var(--ease-out) backwards; }
+.app__main > :nth-child(2) { animation-delay: 0.06s; }
+.app__main > :nth-child(3) { animation-delay: 0.12s; }
+.app__main > :nth-child(4) { animation-delay: 0.18s; }
+.app__main > :nth-child(n + 5) { animation-delay: 0.24s; }
+.progress-ring svg { animation: turnIn 1s 0.3s var(--ease-out) backwards; }
+.quick-add { transition: box-shadow 0.3s var(--ease-out), border-color 0.3s; }
+.quick-add__submit svg, .rt-add-button svg { transition: rotate 0.4s var(--spring); }
+.category-chip, .segmented button, .rt-segmented button, .icon-button { transition: background-color 0.25s, color 0.25s, border-color 0.25s, box-shadow 0.25s, scale 0.18s var(--ease-out); }
+.category-chip:active, .segmented button:active, .rt-segmented button:active, .icon-button:active { scale: 0.94; }
+.segmented .is-active, .rt-segmented .is-active { animation: popIn 0.3s var(--spring); }
+.item { transition: translate 0.25s var(--ease-out), background-color 0.2s; }
+.empty__art { animation: bob 6s ease-in-out infinite; }
+.empty__spark { animation: twinkle 2.6s ease-in-out infinite; }
+.empty__spark--two { animation-delay: -1.3s; }
+.install-tip__icon { animation: bob 5s ease-in-out infinite; }
+.fab { animation: popIn 0.5s 0.5s var(--spring) backwards; transition: scale 0.2s var(--ease-out), translate 0.3s var(--ease-out), box-shadow 0.3s; }
+.fab:active { scale: 0.92; }
+.fab svg { transition: rotate 0.45s var(--spring); }
+.fab:active svg { rotate: 90deg; }
+
+/* 旅行打卡：邮戳盖下来，数字依次出现 */
+.rt-main > * { animation: riseIn 0.55s var(--ease-out) backwards; }
+.rt-main > :nth-child(2) { animation-delay: 0.08s; }
+.rt-main > :nth-child(n + 3) { animation-delay: 0.16s; }
+.rt-hero__stamp { animation: stampIn 0.7s 0.55s var(--ease-out) backwards; }
+.rt-stat { animation: popIn 0.5s 0.2s var(--spring) backwards; }
+.rt-stat:nth-child(2) { animation-delay: 0.28s; }
+.rt-stat:nth-child(3) { animation-delay: 0.36s; }
+.rt-stat__icon { transition: rotate 0.4s var(--spring), scale 0.4s var(--spring); }
+.rt-place-list > * { transition: translate 0.25s var(--ease-out), background-color 0.2s, box-shadow 0.25s; }
+.rt-back svg { transition: translate 0.3s var(--ease-out); }
+
+@media (hover: hover) {
+  .hub-card:hover { translate: 0 -4px; }
+  .hub-card:hover .hub-card__arrow { translate: 3px -3px; }
+  .hub-card:hover .hub-card__cta svg { translate: 5px 0; }
+  .item:hover { translate: 3px 0; }
+  .quick-add__submit:hover svg, .rt-add-button:hover svg, .fab:hover svg { rotate: 90deg; }
+  .fab:hover { translate: 0 -3px; }
+  .rt-stat:hover .rt-stat__icon { rotate: -8deg; scale: 1.12; }
+  .rt-place-list > *:hover { translate: 3px 0; }
+  .rt-back:hover svg { translate: -4px 0; }
+  .category-chip:hover { scale: 1.04; }
+}
