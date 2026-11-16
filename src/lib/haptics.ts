@@ -23,8 +23,14 @@ function iosTick() {
   iosSwitch.click();
 }
 
+type NativeBridge = { webkit?: { messageHandlers?: { haptic?: { postMessage: (v: string) => void } } } };
+
 export function haptic(ms = 10) {
-  if (typeof navigator.vibrate === 'function') {
+  // 在 iPhone 原生外壳里，交给外壳用系统触感引擎震动，手感最好
+  const native = (window as unknown as NativeBridge).webkit?.messageHandlers?.haptic;
+  if (native) {
+    native.postMessage('light');
+  } else if (typeof navigator.vibrate === 'function') {
     navigator.vibrate(ms);
   } else {
     iosTick();

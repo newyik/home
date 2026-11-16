@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import UniformTypeIdentifiers
 import WebKit
 
 private enum Page: String, CaseIterable, Identifiable {
@@ -34,6 +35,8 @@ private final class DesktopController: NSObject, ObservableObject, WKNavigationD
         web.navigationDelegate = self
         web.uiDelegate = self
         web.allowsBackForwardNavigationGestures = true
+        let saved = UserDefaults.standard.double(forKey: "pageZoom")
+        if saved > 0 { web.pageZoom = saved }
         observation = web.observe(\.url, options: [.new]) { [weak self] _, _ in
             Task { @MainActor in self?.readPage() }
         }
@@ -89,6 +92,12 @@ private final class DesktopController: NSObject, ObservableObject, WKNavigationD
                 """, arguments: [:], in: nil, contentWorld: .page
             )
         }
+    }
+
+    func zoom(_ step: Int) {
+        let next = step == 0 ? 1 : web.pageZoom + CGFloat(step) * 0.1
+        web.pageZoom = min(max(next, 0.6), 2)
+        UserDefaults.standard.set(Double(web.pageZoom), forKey: "pageZoom")
     }
 
     func openBrowser() {
@@ -221,14 +230,29 @@ private final class DesktopController: NSObject, ObservableObject, WKNavigationD
 
     func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String,
                  initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Void) {
-        Task { completionHandler(await ask(message, primary: "确认", cancel: true)) }
+        let risky = ["删除", "移除", "退出", "清空"].contains { message.contains($0) }
+        Task { completionHandler(await ask(message, primary: "确认", cancel: true, destructive: risky)) }
     }
 
-    private func ask(_ title: String, detail: String = "", primary: String, cancel: Bool) async -> Bool {
+    // 网页里的 <input type=file>（比如换头像）在外壳里要自己弹选择框
+    func webView(_ webView: WKWebView, runOpenPanelWith parameters: WKOpenPanelParameters,
+                 initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping ([URL]?) -> Void) {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = parameters.allowsMultipleSelection
+        panel.canChooseDirectories = false
+        panel.allowedContentTypes = [.jpeg, .png, .webP]
+        guard let window = web.window else { completionHandler(nil); return }
+        panel.beginSheetModal(for: window) { result in
+            completionHandler(result == .OK ? panel.urls : nil)
+        }
+    }
+
+    private func ask(_ title: String, detail: String = "", primary: String, cancel: Bool,
+                     destructive: Bool = false) async -> Bool {
         let alert = NSAlert()
         alert.messageText = title
         alert.informativeText = detail
-        alert.addButton(withTitle: primary)
+        alert.addButton(withTitle: primary).hasDestructiveAction = destructive
         if cancel { alert.addButton(withTitle: "取消") }
         guard let window = web.window else { return false }
         return await alert.beginSheetModal(for: window) == .alertFirstButtonReturn
@@ -307,6 +331,12 @@ private struct LittleHomeDesktop: App {
                 Button("打开小家设置") { controller.settings() }.keyboardShortcut(",")
                     .disabled(!controller.ready || controller.page == .travel)
                 Button("在浏览器打开") { controller.openBrowser() }
+            }
+            CommandGroup(after: .toolbar) {
+                Button("放大") { controller.zoom(1) }.keyboardShortcut("+")
+                Button("缩小") { controller.zoom(-1) }.keyboardShortcut("-")
+                Button("实际大小") { controller.zoom(0) }.keyboardShortcut("0")
+                Divider()
             }
         }
     }
