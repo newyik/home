@@ -71,7 +71,8 @@ open 'macOS/build/小家控.app'
 ## Supabase：务必小心
 
 - **这个 Supabase 项目和另一个应用「日和账本」共用。** 只能改小家控自己的表，绝对不能改、删日和账本的表、函数、策略或数据。
-- 小家控的对象都定义在 `supabase/schema.sql` 里：表 `profiles`、`households`、`household_members`、`items`、`roadtrip_places`，以及里面的函数、触发器、RLS 策略和 Realtime 配置。不确定某个对象属于哪个应用时，先问用户。
+- 小家控的对象都定义在 `supabase/schema.sql` 里：表 `profiles`、`households`、`household_members`、`items`、`roadtrip_places`，以及里面的函数、触发器、RLS 策略和 Realtime 配置。`profiles` 是小家控独有的，日和账本用的是自己的 `ledger_profiles`。不确定某个对象属于哪个应用时，先问用户。
+- **两个项目共用 `auth.users` 登录账号。** 小家控的 `on_auth_user_created` 触发器在任何新账号注册时都会运行，包括从日和账本注册的账号，并会在 `profiles` 里自动建一条资料。改这个触发器或 `handle_new_user` 函数时，要确认它不会报错，否则日和账本也会注册失败。
 - **数据库变更只能追加新的迁移**：在 `supabase/` 下新建迁移文件，写法参考 `avatar-migration.sql`（例如 `add column if not exists`，可以重复运行）。不要改已经执行过的迁移，不要 `drop` 表或字段，不要写会清空、重写已有数据的语句。迁移由用户自己在 Supabase SQL Editor 里执行，执行前要先让用户看过。
 - 同时把改动合并进 `schema.sql`，让新建的项目一次就能建出完整结构。
 - 改 SQL 时，在 `supabase/tests/` 里补一个验证脚本，写法参考已有文件：包在事务里，最后回滚，不留任何数据。
