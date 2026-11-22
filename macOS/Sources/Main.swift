@@ -51,7 +51,7 @@ private final class DesktopController: NSObject, ObservableObject, WKNavigationD
     func start() {
         error = nil
         loading = true
-        web.load(URLRequest(url: Self.root, cachePolicy: .useProtocolCachePolicy, timeoutInterval: 30))
+        web.load(URLRequest(url: Self.root, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 30))
     }
 
     func go(_ page: Page) {
