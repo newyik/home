@@ -30,6 +30,8 @@ private final class DesktopController: NSObject, ObservableObject, WKNavigationD
     override init() {
         let config = WKWebViewConfiguration()
         config.websiteDataStore = .default()
+        // 让网页认出自己在 Mac 客户端里，不再提示下载客户端
+        config.applicationNameForUserAgent = "LittleHomeMac/3.4"
         web = WKWebView(frame: .zero, configuration: config)
         super.init()
         web.navigationDelegate = self

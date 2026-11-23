@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { AlertTriangle, LoaderCircle, RefreshCw } from 'lucide-react';
 import { AppProvider, useApp } from './context/AppContext';
 import { ToastProvider } from './context/ToastContext';
+import { MacDownloadTip } from './components/MacDownloadTip';
 import { AuthScreen } from './components/AuthScreen';
 import { Home } from './components/Home';
 import { Hub } from './components/Hub';
@@ -160,6 +161,7 @@ export default function App() {
     <ToastProvider>
       <AppProvider>
         <Shell />
+        <MacDownloadTip />
       </AppProvider>
     </ToastProvider>
   );

@@ -5755,3 +5755,74 @@ h1, h2 { text-wrap: balance; }
   .rt-back:hover svg { translate: -4px 0; }
   .category-chip:hover { scale: 1.04; }
 }
+
+/* ---------- Mac 客户端下载提示（右下角） ---------- */
+.mac-tip {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 60;
+  width: 280px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+
+.mac-tip strong {
+  display: block;
+  padding-right: 24px;
+  font-size: 15px;
+}
+
+.mac-tip p {
+  margin: 6px 0 12px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.mac-tip-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.mac-tip-close:hover {
+  background: var(--surface-3);
+}
+
+.mac-tip-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.mac-tip-link:hover {
+  background: var(--accent-deep);
+}
+
+/* 窗口太窄时卡片会挡住内容，干脆不显示 */
+@media (max-width: 720px) {
+  .mac-tip {
+    display: none;
+  }
+}
